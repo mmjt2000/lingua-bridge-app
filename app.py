@@ -398,14 +398,6 @@ def page_lessons():
     else:
         st.markdown('<div class="main-header">📚 Mis Lecciones</div>',
                     unsafe_allow_html=True)
-      # ============ DEBUG TEMPORAIRE ============
-    with st.expander("🔧 DEBUG — Fichiers détectés"):
-        all_files = sorted(os.listdir("."))
-        st.write(f"**{len(all_files)} fichiers/dossiers :**")
-        for f in all_files:
-            exists = os.path.isfile(f)
-            st.code(f"{'📄' if exists else '📁'} {f}")
-    # ============ FIN DEBUG ============
       # ============ DOCUMENTOS GENERALES ============
     st.markdown("### 📁 Documentos generales del curso")
     st.caption("Guías, programa, metodología y recursos complementarios")
