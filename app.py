@@ -422,7 +422,7 @@ def page_lessons():
             ("02- Answer_Key_19_Lecons_Course_Slides.pdf", "✅ Corrigés PPTX")
         )
         general_docs.append(
-            ("03- Answer_Key_19_Lecons_Additional_Exercises.pdf", "✅ Corrigés ejercicios")
+            ("03- Answer_Key_19_Lecons_Additional_Exercices.pdf", "✅ Corrigés ejercicios")
         )
         general_docs.append(
             ("Progress_Tracker.xlsx", "📊 Progress Tracker")
