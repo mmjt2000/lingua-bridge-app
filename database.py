@@ -252,3 +252,15 @@ def change_password(username, new_password):
     conn.commit()
     conn.close()
     return True
+
+
+def change_password(username, new_password):
+    """Change le mot de passe d'un utilisateur."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE users SET password = ? WHERE username = ?",
+        (new_password, username)
+    )
+    conn.commit()
+    conn.close()
+    return True
