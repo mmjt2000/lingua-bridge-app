@@ -241,3 +241,14 @@ def get_student_id_by_username(username):
     ).fetchone()
     conn.close()
     return row["id"] if row else None
+
+def change_password(username, new_password):
+    """Change le mot de passe d'un utilisateur."""
+    conn = get_connection()
+    conn.execute(
+        "UPDATE users SET password = ? WHERE username = ?",
+        (new_password, username)
+    )
+    conn.commit()
+    conn.close()
+    return True
