@@ -74,7 +74,7 @@ def main():
     print("OK - Tables créées")
 
     # Créer le prof
-    if create_user("jean", "lingua2026", "teacher",
+    if create_user("jean", "Jm103763$", "teacher",
                    "Jean Thomas MONTREUIL", "jean@linguabridge.com"):
         print("OK - Prof créé : jean / lingua2026")
     else:
