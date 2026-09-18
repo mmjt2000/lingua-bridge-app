@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.db
+materials/
+.env
+app_backup_*.py
+setup_materials.py
