@@ -398,6 +398,43 @@ def page_lessons():
     else:
         st.markdown('<div class="main-header">📚 Mis Lecciones</div>',
                     unsafe_allow_html=True)
+      # ============ DOCUMENTOS GENERALES ============
+    st.markdown("### 📁 Documentos generales del curso")
+    st.caption("Guías, programa, metodología y recursos complementarios")
+
+    general_docs = [
+        ("00-Start_here.pdf", "🚀 Guía de inicio"),
+        ("01-Syllabus.pdf", "📅 Programa del curso"),
+        ("04-Preambule.pdf", "📖 Preámbulo"),
+        ("05-Methodology_Guide.pdf", "🎓 Guía pedagógica"),
+    ]
+
+    if is_teacher:
+        general_docs.append(
+            ("02-Answer_Key_19_Leçons_Course_Slides.pdf", "✅ Corrigés PPTX")
+        )
+        general_docs.append(
+            ("03-Answer_Key_19_Leçons_Additional_Exercises.pdf", "✅ Corrigés ejercicios")
+        )
+        general_docs.append(
+            ("Progress_Tracker.xlsx", "📊 Progress Tracker")
+        )
+
+    cols = st.columns(2)
+    for i, (filename, label) in enumerate(general_docs):
+        with cols[i % 2]:
+            if os.path.exists(filename):
+                with open(filename, "rb") as f:
+                    st.download_button(
+                        f"⬇️ {label}",
+                        f,
+                        file_name=filename,
+                        key=f"doc_{filename}",
+                        use_container_width=True
+                    )
+
+    st.markdown("---")
+    st.markdown("### 📚 Lecciones individuales")
 
     lessons = [
         ("Class 00", "Revision Class", "A1"),
