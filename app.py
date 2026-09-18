@@ -411,18 +411,18 @@ def page_lessons():
     st.caption("Guías, programa, metodología y recursos complementarios")
 
     general_docs = [
-        ("00-Start_here.pdf", "🚀 Guía de inicio"),
-        ("01-Syllabus.pdf", "📅 Programa del curso"),
-        ("04-Preambule.pdf", "📖 Preámbulo"),
-        ("05-Methodology_Guide.pdf", "🎓 Guía pedagógica"),
+        ("00- Start_here.pdf", "🚀 Guía de inicio"),
+        ("01- Syllabus.pdf", "📅 Programa del curso"),
+        ("04- Preambule.pdf", "📖 Preámbulo"),
+        ("05- Methodology_Guide.pdf", "🎓 Guía pedagógica"),
     ]
 
     if is_teacher:
         general_docs.append(
-            ("02-Answer_Key_19_Leçons_Course_Slides.pdf", "✅ Corrigés PPTX")
+            ("02- Answer_Key_19_Lecons_Course_Slides.pdf", "✅ Corrigés PPTX")
         )
         general_docs.append(
-            ("03-Answer_Key_19_Leçons_Additional_Exercises.pdf", "✅ Corrigés ejercicios")
+            ("03- Answer_Key_19_Lecons_Additional_Exercises.pdf", "✅ Corrigés ejercicios")
         )
         general_docs.append(
             ("Progress_Tracker.xlsx", "📊 Progress Tracker")
