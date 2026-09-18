@@ -168,6 +168,7 @@ def render_sidebar():
                 ("📚 Lecciones", "lessons"),
                 ("📊 Progreso", "progress"),
                 ("🎓 Certificado", "certificate"),
+                ("🔐 Cambiar contraseña", "change_password"),
             ]
         else:
             menu_items = [
@@ -255,7 +256,23 @@ def page_teacher_dashboard():
                         f"{row['lesson']} — {row['content']}")
     else:
         st.info("Todas las sesiones están completadas")
+def page_change_password():
+    st.markdown('<div class="main-header">🔐 Cambiar contraseña</div>',
+                unsafe_allow_html=True)
 
+    with st.form("change_pwd"):
+        new_pwd = st.text_input("Nueva contraseña", type="password")
+        confirm = st.text_input("Confirmar contraseña", type="password")
+
+        if st.form_submit_button("Cambiar", type="primary"):
+            if new_pwd != confirm:
+                st.error("Las contraseñas no coinciden")
+            elif len(new_pwd) < 6:
+                st.error("Mínimo 6 caracteres")
+            else:
+                change_password(st.session_state.user["username"], new_pwd)
+                st.success("✅ Contraseña cambiada")
+                st.info("Cierra sesión y vuelve a entrar con la nueva contraseña.")
 
 # =====================================================================
 # PAGE : SESSION LIVE
@@ -663,6 +680,30 @@ def page_certificate():
 # =====================================================================
 # ROUTER
 # =====================================================================
+def page_change_password():
+    import time
+    from database import change_password
+
+    st.markdown('<div class="main-header">🔐 Cambiar contraseña</div>',
+                unsafe_allow_html=True)
+
+    with st.form("change_pwd"):
+        new_pwd = st.text_input("Nueva contraseña", type="password")
+        confirm = st.text_input("Confirmar contraseña", type="password")
+
+        if st.form_submit_button("Cambiar", type="primary",
+                                  use_container_width=True):
+            if new_pwd != confirm:
+                st.error("Las contraseñas no coinciden")
+            elif len(new_pwd) < 6:
+                st.error("Mínimo 6 caracteres")
+            else:
+                change_password(st.session_state.user["username"], new_pwd)
+                st.success("✅ Contraseña cambiada")
+                st.info("Cierra sesión y vuelve a entrar con la nueva contraseña.")
+                time.sleep(2)
+
+
 def main():
     if not st.session_state.logged_in:
         page_login()
@@ -688,6 +729,8 @@ def main():
             page_progress()
         elif page == "certificate":
             page_certificate()
+        elif page == "change_password":
+            page_change_password()
         else:
             page_teacher_dashboard()
     else:
