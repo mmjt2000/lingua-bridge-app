@@ -14,9 +14,8 @@ from database import (get_all_sessions, get_session_by_num, update_session,
                        get_student_submissions, get_pending_submissions,
                        get_all_submissions_with_feedback, save_feedback)
 
-# Initialiser la base de données si elle n'existe pas
-import os as _os
-if not _os.path.exists("lingua_bridge.db"):
+# Auto-init de la base de données (pour Streamlit Cloud)
+if not os.path.exists("lingua_bridge.db"):
     try:
         from init_data import main as _init_main
         _init_main()
@@ -195,6 +194,7 @@ def render_sidebar():
             st.session_state.page = "dashboard"
             st.rerun()
 
+
 # =====================================================================
 # PAGE : DASHBOARD PROF
 # =====================================================================
@@ -245,8 +245,8 @@ def page_teacher_dashboard():
         st.success("🎉 ¡Todas las sesiones están completadas!")
 
     st.markdown("---")
-
     st.markdown("### 📋 Próximas sesiones")
+
     df = pd.DataFrame(sessions)
     upcoming = df[df["attended"] == 0].head(5)
     if not upcoming.empty:
@@ -301,14 +301,16 @@ def page_session_live():
         col1, col2 = st.columns(2)
         with col1:
             st.markdown("### 📄 Material del profesor")
-            pptx_path = f"materials/teacher/{class_prefix}_PPT.pptx"
-            notes_path = f"materials/teacher/{class_prefix}_Notes.pdf"
+            pptx_path = f"{class_prefix}_PPT.pptx"
+            notes_path = f"{class_prefix}_Notes.pdf"
 
             if os.path.exists(pptx_path):
                 with open(pptx_path, "rb") as f:
                     st.download_button("⬇️ Descargar PPTX", f,
                                         file_name=f"{class_prefix}_PPT.pptx",
                                         use_container_width=True)
+            else:
+                st.caption(f"⚠️ No encontrado: {pptx_path}")
 
             if os.path.exists(notes_path):
                 with open(notes_path, "rb") as f:
@@ -318,7 +320,7 @@ def page_session_live():
 
         with col2:
             st.markdown("### 📘 Material del alumno")
-            student_path = f"materials/student/{class_prefix}_Student.pdf"
+            student_path = f"{class_prefix}_Student.pdf"
             if os.path.exists(student_path):
                 with open(student_path, "rb") as f:
                     st.download_button("⬇️ Descargar Cuaderno", f,
@@ -410,8 +412,9 @@ def page_lessons():
                 col1, col2 = st.columns(2)
                 with col1:
                     st.markdown("**📄 Material del profesor**")
-                    pptx = f"materials/teacher/{prefix}_PPT.pptx"
-                    notes = f"materials/teacher/{prefix}_Notes.pdf"
+
+                    pptx = f"{prefix}_PPT.pptx"
+                    notes = f"{prefix}_Notes.pdf"
 
                     if os.path.exists(pptx):
                         with open(pptx, "rb") as f:
@@ -419,26 +422,33 @@ def page_lessons():
                                 file_name=f"{prefix}_PPT.pptx",
                                 key=f"pptx_{prefix}",
                                 use_container_width=True)
+                    else:
+                        st.caption(f"⚠️ Falta {pptx}")
+
                     if os.path.exists(notes):
                         with open(notes, "rb") as f:
                             st.download_button("⬇️ Notas del profesor", f,
                                 file_name=f"{prefix}_Notes.pdf",
                                 key=f"notes_{prefix}",
                                 use_container_width=True)
+                    else:
+                        st.caption(f"⚠️ Falta {notes}")
 
                 with col2:
                     st.markdown("**📘 Material del alumno**")
-                    student = f"materials/student/{prefix}_Student.pdf"
+                    student = f"{prefix}_Student.pdf"
                     if os.path.exists(student):
                         with open(student, "rb") as f:
                             st.download_button("⬇️ Cuaderno", f,
                                 file_name=f"{prefix}_Student.pdf",
                                 key=f"student_{prefix}",
                                 use_container_width=True)
+                    else:
+                        st.caption(f"⚠️ Falta {student}")
             else:
                 st.markdown("**📘 Mi cuaderno de trabajo**")
                 st.caption("Descarga el cuaderno para esta lección")
-                student = f"materials/student/{prefix}_Student.pdf"
+                student = f"{prefix}_Student.pdf"
                 if os.path.exists(student):
                     with open(student, "rb") as f:
                         st.download_button(
@@ -447,6 +457,8 @@ def page_lessons():
                             file_name=f"{prefix}_Student.pdf",
                             key=f"student_{prefix}",
                             use_container_width=True)
+                else:
+                    st.info("El cuaderno estará disponible pronto")
 
 
 # =====================================================================
@@ -471,7 +483,7 @@ def page_progress():
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("Aún no hay scores")
+            st.info("Aún no hay scores registrados")
 
     with col2:
         st.markdown("### 📊 Asistencia acumulada")
@@ -511,12 +523,12 @@ def page_exercises():
                                   use_container_width=True, type="primary"):
             if answer.strip():
                 save_submission(student_id, lesson, exercise_num, answer)
-                st.success("✅ Respuesta enviada")
+                st.success("✅ Respuesta enviada. El profesor la revisará pronto.")
                 st.balloons()
                 time.sleep(1)
                 st.rerun()
             else:
-                st.warning("⚠️ Escribe una respuesta")
+                st.warning("⚠️ Escribe una respuesta antes de enviar")
 
     st.markdown("---")
     st.markdown("### 📋 Mis envíos")
@@ -538,7 +550,7 @@ def page_exercises():
                 st.markdown("**📝 Feedback del profesor:**")
                 st.success(sub["feedback"])
             else:
-                st.caption("⏳ Pendiente de corrección")
+                st.caption("⏳ El profesor aún no ha corregido este ejercicio.")
 
 
 # =====================================================================
@@ -595,6 +607,7 @@ def page_submissions():
                     st.markdown("**📝 Tu retroalimentación:**")
                     st.success(sub["feedback"])
 
+
 # =====================================================================
 # PAGE : CALENDRIER (élève)
 # =====================================================================
@@ -636,7 +649,7 @@ def page_certificate():
 
     if stats["attended"] >= stats["total"]:
         st.success("🎉 Curso completado")
-        cert = "materials/documents/06-Certificate.pdf"
+        cert = "06-Certificate.pdf"
         if os.path.exists(cert):
             with open(cert, "rb") as f:
                 st.download_button("⬇️ Descargar certificado", f,
@@ -644,7 +657,7 @@ def page_certificate():
                                     use_container_width=True)
     else:
         rem = stats["total"] - stats["attended"]
-        st.warning(f"⏳ Faltan {rem} sesiones")
+        st.warning(f"⏳ Faltan {rem} sesiones para completar el curso")
 
 
 # =====================================================================
@@ -688,11 +701,28 @@ def main():
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Lecciones", f"{stats['attended']}/{stats['total']}")
+                st.metric("Lecciones completadas",
+                          f"{stats['attended']}/{stats['total']}")
             with col2:
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
                 st.metric("Asistencia", f"{stats['attendance_rate']}%")
+
+            st.markdown("---")
+            st.markdown("### 🎯 Siguiente lección")
+            sessions = get_all_sessions()
+            next_s = next((s for s in sessions if not s["attended"]), None)
+            if next_s:
+                st.markdown(f"""
+                <div class="metric-card">
+                    <h3 style='color: #3D1F5C; margin: 0;'>
+                        {next_s['lesson']} — {next_s['content']}
+                    </h3>
+                    <p style='color: #666;'>
+                        📅 {next_s['date']} ({next_s['day']})
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
         elif page == "lessons":
             page_lessons()
         elif page == "exercises":
