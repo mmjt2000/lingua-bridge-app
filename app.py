@@ -152,7 +152,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
 
-            st.markdown("<div style='height: 2.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height: 2.5rem;'></div>", unsafe_allow_html=True)
 
         if user["role"] == "teacher":
             menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
