@@ -535,6 +535,8 @@ def page_progress():
 # ==================== EXERCICES (élève) ====================
 def page_exercises():
     import time
+    from sheets_db import save_audio_submission
+
     user = st.session_state.user
     student_id = user["id"]
     lang = get_lang()
@@ -547,29 +549,81 @@ def page_exercises():
     else:
         lessons_opts = [f"Class {i:02d}" for i in range(19)]
 
-    with st.form("submit_exercise"):
+    # ============ ONGLETS : TEXTE / AUDIO ============
+    tab_text, tab_audio = st.tabs(["📝 Escrito", "🎤 Audio"])
+
+    # ============ ONGLET TEXTE ============
+    with tab_text:
+        with st.form("submit_text"):
+            col1, col2 = st.columns(2)
+            with col1:
+                lesson = st.selectbox("Lección", lessons_opts, key="lesson_text")
+            with col2:
+                exercise_num = st.number_input("Número de ejercicio",
+                                                1, 20, 1, key="ex_text")
+
+            answer = st.text_area("Tu respuesta", height=200,
+                                  placeholder="Escribe aquí tu respuesta...",
+                                  key="answer_text")
+
+            if st.form_submit_button("📤 Enviar al profesor",
+                                      use_container_width=True, type="primary"):
+                if answer.strip():
+                    save_submission(student_id, lesson, exercise_num, answer)
+                    st.success("✅ Respuesta enviada")
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+                else:
+                    st.warning("⚠️ Escribe una respuesta")
+
+    # ============ ONGLET AUDIO ============
+    with tab_audio:
+        st.markdown("**🎤 Graba tu audio directamente desde aquí**")
+        st.caption("Presiona el micrófono para comenzar a grabar")
+
         col1, col2 = st.columns(2)
         with col1:
-            lesson = st.selectbox("Lección", lessons_opts)
+            lesson_audio = st.selectbox("Lección", lessons_opts,
+                                          key="lesson_audio")
         with col2:
-            exercise_num = st.number_input("Número de ejercicio", 1, 20, 1)
+            exercise_num_audio = st.number_input("Número de ejercicio",
+                                                   1, 20, 1, key="ex_audio")
 
-        answer = st.text_area("Tu respuesta", height=200,
-                              placeholder="Escribe aquí tu respuesta...")
+        # Widget d'enregistrement audio
+        audio_value = st.audio_input("🎤 Graba tu audio")
 
-        if st.form_submit_button("📤 Enviar al profesor",
-                                  use_container_width=True, type="primary"):
-            if answer.strip():
-                save_submission(student_id, lesson, exercise_num, answer)
-                st.success("✅ Respuesta enviada")
-                st.balloons()
-                time.sleep(1)
-                st.rerun()
-            else:
-                st.warning("⚠️ Escribe una respuesta")
+        if audio_value is not None:
+            st.audio(audio_value, format="audio/wav")
 
+            if st.button("📤 Enviar audio al profesor",
+                          use_container_width=True, type="primary"):
+                try:
+                    audio_bytes = audio_value.getvalue()
+                    filename = (f"L{lesson_audio[1:]}_Ej{exercise_num_audio}_"
+                                f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+                    if lang == "fr":
+                        filename = (f"FR_{lesson_audio}_Ej{exercise_num_audio}_"
+                                    f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+                    else:
+                        filename = (f"EN_{lesson_audio.replace(' ', '')}_Ej{exercise_num_audio}_"
+                                    f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+
+                    save_audio_submission(
+                        student_id, lesson_audio, exercise_num_audio,
+                        audio_bytes, filename
+                    )
+                    st.success("✅ Audio enviado al profesor")
+                    st.balloons()
+                    time.sleep(1)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"❌ Error al enviar: {e}")
+
+    # ============ LISTE DES ENVOIS ============
     st.markdown("---")
     st.markdown("### 📋 Mis envíos")
+
     submissions = get_student_submissions(student_id)
     if not submissions:
         st.info("Aún no has enviado ejercicios.")
@@ -580,13 +634,18 @@ def page_exercises():
         status = "✅ Corregido" if has_fb else "🟡 En espera"
         with st.expander(f"{status} · {sub['lesson']} · Ej. {sub['exercise_num']}"):
             st.markdown(f"**Enviado:** {sub['submitted_at'][:16]}")
-            st.markdown(f'<div class="answer-box">{sub["answer"]}</div>',
-                        unsafe_allow_html=True)
+
+            # Si c'est un audio
+            if sub["answer"].startswith("🎤 Audio:"):
+                link = sub["answer"].replace("🎤 Audio: ", "")
+                st.markdown(f"🎤 **Audio enviado** — [Abrir en Google Drive]({link})")
+            else:
+                st.markdown(f'<div class="answer-box">{sub["answer"]}</div>',
+                            unsafe_allow_html=True)
+
             if has_fb:
                 st.markdown("**📝 Feedback:**")
                 st.success(sub["feedback"])
-
-
 # ==================== SUBMISSIONS (prof) ====================
 def page_submissions():
     import time
