@@ -340,6 +340,7 @@ def page_lessons():
     is_teacher = user["role"] == "teacher"
     lang = get_lang()
 
+    # ============ TITRE ============
     if lang == "fr":
         title = "📚 Leçons — Vue Professeur" if is_teacher else "📚 Mes Leçons"
         lessons = [
@@ -394,12 +395,12 @@ def page_lessons():
     st.markdown(f'<div class="main-header">{title}</div>',
                 unsafe_allow_html=True)
 
-      # ============ DOCUMENTS GÉNÉRAUX FRANÇAIS ============
+    # ============ DOCUMENTS GÉNÉRAUX FRANÇAIS ============
     if lang == "fr":
         st.markdown("### 📁 Documents généraux du cours de français")
         st.caption("Programme, méthodologie et ressources")
 
-    general_docs_fr = [
+        general_docs_fr = [
             ("fr/syllabus_fr.pdf", "📅 Programme du cours"),
             ("fr/methodology_guide_fr.pdf", "🎓 Guide pédagogique"),
         ]
@@ -408,6 +409,7 @@ def page_lessons():
                 ("fr/progress_tracker_fr.xlsx", "📊 Progress Tracker FR"))
             general_docs_fr.append(
                 ("fr/corriges_fr.pdf", "✅ Corrigés des exercices"))
+
         cols = st.columns(2)
         for i, (filename, label) in enumerate(general_docs_fr):
             with cols[i % 2]:
@@ -418,8 +420,8 @@ def page_lessons():
                             key=f"doc_fr_{filename}",
                             use_container_width=True)
         st.markdown("---")
-  
-  # ============ DOCUMENTS GÉNÉRAUX ============
+
+    # ============ DOCUMENTS GÉNÉRAUX ANGLAIS ============
     if lang == "en":
         st.markdown("### 📁 Documentos generales del curso")
         st.caption("Guías, programa, metodología y recursos complementarios")
@@ -448,6 +450,7 @@ def page_lessons():
                             use_container_width=True)
         st.markdown("---")
 
+    # ============ LEÇONS INDIVIDUELLES ============
     st.markdown("### 📚 Lecciones individuales")
 
     for class_name, title_l, level in lessons:
@@ -499,8 +502,6 @@ def page_lessons():
                             use_container_width=True)
                 else:
                     st.info("El cuaderno estará disponible pronto")
-
-
 # ==================== PROGRESO ====================
 def page_progress():
     st.markdown('<div class="main-header">📊 Progreso</div>',
