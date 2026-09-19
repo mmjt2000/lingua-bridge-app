@@ -35,6 +35,36 @@ st.markdown("""
         text-align: center;}
     .answer-box {background: #F0F8F0; padding: 1rem; border-radius: 8px;
         border-left: 4px solid #2E7D32;}
+
+    /* SIDEBAR COMPACTE */
+    section[data-testid="stSidebar"] {
+        min-width: 230px !important;
+        max-width: 230px !important;
+    }
+    section[data-testid="stSidebar"] > div:first-child {
+        padding: 0.3rem 0.5rem !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
+    section[data-testid="stSidebar"] [data-testid="element-container"] {
+        margin: 0 !important;
+    }
+    section[data-testid="stSidebar"] hr {
+        margin: 0.3rem 0 !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button {
+        padding: 0.2rem 0.4rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 8px !important;
+        min-height: 30px !important;
+        height: 30px !important;
+        margin: 0 0 0.15rem 0 !important;
+    }
+    section[data-testid="stSidebar"] .stButton > button p {
+        font-size: 0.8rem !important;
+        margin: 0 !important;
+    }        
 </style>
 """, unsafe_allow_html=True)
 
