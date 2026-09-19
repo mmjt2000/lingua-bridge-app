@@ -316,7 +316,7 @@ def page_login():
         st.markdown("""
         <div style='text-align: center;'>
             <h1 style='color: #3D1F5C; font-size: 3rem; margin-bottom: 0;'>
-                🌉 Lingua Bridge Academy
+                Lingua Bridge Academy
             </h1>
             <p style='color: #C9A227; font-style: italic; margin-top: 0;'>
                 Building bridges through language
