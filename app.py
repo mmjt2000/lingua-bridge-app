@@ -156,6 +156,7 @@ def render_sidebar():
             <small style='color: #666;'>{role_label}</small>
         </div>
         """, unsafe_allow_html=True)
+        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
         st.markdown("---")
 
         if user["role"] == "teacher":
