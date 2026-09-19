@@ -815,11 +815,9 @@ def main():
     if not st.session_state.logged_in:
         page_login()
         return
-
     render_sidebar()
     user = st.session_state.user
     page = st.session_state.page
-
     if user["role"] == "teacher":
         if page == "dashboard":
             page_teacher_dashboard()
@@ -841,39 +839,18 @@ def main():
             page_change_password()
         else:
             page_teacher_dashboard()
-    else:
+    elif user["role"] == "student":
         if page == "dashboard":
-            st.markdown('<div class="main-header">'
-                        '¡Bienvenida, Ingrid! 🌟</div>',
-                        unsafe_allow_html=True)
-            st.markdown('<div class="sub-header">'
-                        'Lingua Bridge Academy · Inglés y Francés</div>',
-                        unsafe_allow_html=True)
+            st.markdown('<div class="main-header">Bienvenida, Ingrid</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sub-header">Lingua Bridge Academy - Ingles y Frances</div>', unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Lecciones completadas",
-                          f"{stats['attended']}/{stats['total']}")
+                st.metric("Lecciones", f"{stats['attended']}/{stats['total']}")
             with col2:
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
                 st.metric("Asistencia", f"{stats['attendance_rate']}%")
-
-            st.markdown("---")
-            st.markdown("### 🎯 Siguiente lección")
-            sessions = get_all_sessions()
-            next_s = next((s for s in sessions if not s["attended"]), None)
-            if next_s:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <h3 style='color: #3D1F5C; margin: 0;'>
-                        {next_s['lesson']} — {next_s['content']}
-                    </h3>
-                    <p style='color: #666;'>
-                        📅 {next_s['date']} ({next_s['day']})
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
         elif page == "lessons":
             page_lessons()
         elif page == "pronunciation":
@@ -884,6 +861,11 @@ def main():
             page_progress()
         elif page == "calendar":
             page_calendar()
+        else:
+            page_lessons()
+    else:
+        if page == "pronunciation":
+            page_pronunciation()
         else:
             page_lessons()
 
