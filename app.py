@@ -291,8 +291,13 @@ st.markdown("""
         gap: 0 !important;
     }
 
-    section[data-testid="stSidebar"] [data-testid="element-container"] {
-        margin: 0 !important;
+       section[data-testid="stSidebar"] [data-testid="element-container"] {
+        margin: 0.1rem 0 !important;
+    }
+
+    /* Espace après la carte utilisateur */
+    section[data-testid="stSidebar"] [data-testid="element-container"]:has(> div > div > div[style*="linear-gradient"]) {
+        margin-bottom: 0.8rem !important;
     }
 
     /* Radio buttons langue */
@@ -330,7 +335,7 @@ st.markdown("""
         min-height: 32px !important;
         height: 32px !important;
         line-height: 1 !important;
-        margin: 0 0 0.2rem 0 !important;
+         margin: 0 0 0.3rem 0 !important;
         font-weight: 500 !important;
         border: 1.5px solid #E0E7DC !important;
         background: white !important;
@@ -468,7 +473,7 @@ def render_sidebar():
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%);
                     border-radius: 12px; padding: 0.8rem 0.7rem;
-                    margin: 0.5rem 0 0.8rem 0;
+                    margin: 0.6rem 0 1.2rem 0;
                     box-shadow: 0 4px 14px rgba(61, 31, 92, 0.3);'>
             <div style='display: flex; align-items: center; gap: 0.6rem;'>
                 <div style='width: 38px; height: 38px; border-radius: 50%;
