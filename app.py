@@ -156,9 +156,10 @@ def render_sidebar():
 
         if user["role"] == "teacher":
             menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
-        else:
+        elif user["role"] == "student":
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
-
+        else:
+            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
         for label, key in menu_items:
             is_active = st.session_state.page == key
             if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
