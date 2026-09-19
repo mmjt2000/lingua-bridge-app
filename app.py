@@ -290,7 +290,7 @@ def page_session_live():
     with st.form("session_form"):
         attended = st.checkbox("✅ El alumno asistió",
                                 value=bool(session["attended"]))
-        score = st.slider("📊 Puntuación (0-10)", 0.0, 10.0, 5.0, 0.5)
+        score = st.slider("📊 Puntuación (0-100)", 0.0, 100.0, 50.0, 5.0)
         notes = st.text_area("📝 Observaciones",
                               value=session["notes"] or "", height=150)
         if st.form_submit_button("💾 Guardar", use_container_width=True,
@@ -312,7 +312,7 @@ def page_sessions():
             st.markdown(f"**Día:** {row['day']} · "
                         f"**Duración:** {row['duration']}")
             if row["score"] is not None:
-                st.metric("Puntuación", f"{row['score']}/10")
+                st.metric("Puntuación", f"{row['score']}/100")
             if st.button("▶️ Abrir", key=f"open_{row['session_num']}",
                           use_container_width=True):
                 st.session_state.current_session = row["session_num"]
@@ -782,7 +782,7 @@ def page_certificate():
     with col1:
         st.metric("Progreso", f"{stats['attended']}/{stats['total']}")
     with col2:
-        st.metric("Promedio", f"{stats['avg_score']}/10")
+        st.metric("Promedio", f"{stats['avg_score']}/100")
     with col3:
         st.metric("Asistencia", f"{stats['attendance_rate']}%")
     st.markdown("---")
