@@ -142,7 +142,7 @@ def render_sidebar():
         role_label = "PROFESOR" if user["role"] == "teacher" else "ESTUDIANTE"
         initials = "".join([n[0] for n in user['full_name'].split()[:2]]).upper()
 
-               st.markdown(f"""
+        st.markdown(f"""
         <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
             <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #FF6B35; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
             <div style='flex: 1; min-width: 0;'>
