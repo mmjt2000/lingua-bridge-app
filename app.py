@@ -394,7 +394,30 @@ def page_lessons():
     st.markdown(f'<div class="main-header">{title}</div>',
                 unsafe_allow_html=True)
 
-    # ============ DOCUMENTS GÉNÉRAUX ============
+      # ============ DOCUMENTS GÉNÉRAUX FRANÇAIS ============
+    if lang == "fr":
+        st.markdown("### 📁 Documents généraux du cours de français")
+        st.caption("Programme, méthodologie et ressources")
+
+        general_docs_fr = [
+            ("fr/syllabus_fr.pdf", "📅 Programme du cours"),
+        ]
+        if is_teacher:
+            general_docs_fr.append(
+                ("fr/progress_tracker_fr.xlsx", "📊 Progress Tracker FR"))
+
+        cols = st.columns(2)
+        for i, (filename, label) in enumerate(general_docs_fr):
+            with cols[i % 2]:
+                if os.path.exists(filename):
+                    with open(filename, "rb") as f:
+                        st.download_button(f"⬇️ {label}", f,
+                            file_name=filename.split("/")[-1],
+                            key=f"doc_fr_{filename}",
+                            use_container_width=True)
+        st.markdown("---")
+  
+  # ============ DOCUMENTS GÉNÉRAUX ============
     if lang == "en":
         st.markdown("### 📁 Documentos generales del curso")
         st.caption("Guías, programa, metodología y recursos complementarios")
