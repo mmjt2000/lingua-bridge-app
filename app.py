@@ -274,9 +274,10 @@ st.markdown("""
         background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%);
     }
     /* ============ SIDEBAR PRO ============ */
-    section[data-testid="stSidebar"] {
-        min-width: 230px !important;
-        max-width: 230px !important;
+        section[data-testid="stSidebar"] {
+        min-width: 260px !important;
+        max-width: 260px !important;
+        
         background: linear-gradient(180deg, #FFFFFF 0%, #F9FCF6 100%) !important;
         border-right: 1px solid #E0E7DC !important;
     }
