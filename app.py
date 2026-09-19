@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
-"""LINGUA BRIDGE ACADEMY - App multi-langue (EN / FR)"""
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import os
-import streamlit.components.v1 as components
-
-from pronunciation_data import PRONUNCIATION_DATA
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
 
-st.set_page_config(
-    page_title="Lingua Bridge Academy",
-    page_icon=":bridge_at_night:",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="Lingua Bridge Academy", page_icon=":bridge_at_night:", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
@@ -27,9 +18,8 @@ st.markdown("""
     .metric-card { background: white; padding: 1.25rem 1.5rem; border-radius: 16px; border-left: 5px solid #3D1F5C; margin: 0.75rem 0; box-shadow: 0 4px 20px rgba(61, 31, 92, 0.08); }
     .lesson-banner { background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%); color: white; padding: 1.25rem; border-radius: 16px; font-size: 1.5rem; font-weight: 600; text-align: center; }
     .answer-box { background: #F0F8F0; padding: 1rem 1.25rem; border-radius: 12px; border-left: 4px solid #2E7D32; color: #1B5E20; }
-    .stButton > button { border-radius: 12px !important; font-weight: 600 !important; font-family: 'Poppins', sans-serif !important; }
+    .stButton > button { border-radius: 12px !important; font-weight: 600 !important; }
     .stDownloadButton > button { background: white !important; color: #3D1F5C !important; border: 1.5px solid #3D1F5C !important; border-radius: 12px !important; }
-    section[data-testid="stSidebar"] { background: linear-gradient(180deg, #FFFFFF 0%, #F5F9F2 100%) !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -102,25 +92,15 @@ def render_sidebar():
         st.markdown("---")
         role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
         st.markdown(f"""
-        <div style='padding: 0.6rem; background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%); border-radius: 10px;'>
+        <div style='padding: 0.6rem; background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%); border-radius: 10px; margin: 0.5rem 0 1rem 0;'>
             <div style='color: white; font-size: 0.85rem; font-weight: 600;'>{user['full_name']}</div>
             <div style='color: #FFD54F; font-size: 0.7rem; font-weight: 600;'>{role_label}</div>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("---")
         if user["role"] == "teacher":
-            menu_items = [
-                ("Panel", "dashboard"), ("Envios", "submissions"),
-                ("Sesiones", "sessions"), ("Lecciones", "lessons"),
-                ("Pronunciacion", "pronunciation"), ("Progreso", "progress"),
-                ("Certificado", "certificate"), ("Cambiar contrasena", "change_password"),
-            ]
+            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         else:
-            menu_items = [
-                ("Inicio", "dashboard"), ("Mis lecciones", "lessons"),
-                ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"),
-                ("Mi progreso", "progress"), ("Mi calendario", "calendar"),
-            ]
+            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         for label, key in menu_items:
             is_active = st.session_state.page == key
             if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
@@ -233,33 +213,16 @@ def page_lessons():
     user = st.session_state.user
     is_teacher = user["role"] == "teacher"
     lang = get_lang()
-
     if lang == "fr":
         title = "Lecciones - Vista Profesor" if is_teacher else "Mis Lecciones"
-        lessons = [("L01", "Bonjour !", "A1"), ("L02", "Je suis...", "A1"), ("L03", "J'ai...", "A1"),
-                   ("L04", "Le / la / les", "A1"), ("L05", "Je parle", "A1"), ("L06", "Quelle heure ?", "A1"),
-                   ("L07", "Je vais, je fais", "A1"), ("L08", "Mon / ma / mes", "A1"), ("L09", "Je ne... pas", "A1"),
-                   ("L10", "Est-ce que...?", "A1"), ("L11", "Le, la, lui, leur", "A1+"), ("L12", "Plus... que", "A1+"),
-                   ("L13", "J'ai mange", "A1+"), ("L14", "Je suis alle", "A1+"), ("L15", "Quand j'etais...", "A1+"),
-                   ("L16", "Je vais partir", "A1+"), ("L17", "Je voudrais", "A1+"), ("L18", "Qui, que, ou", "A1+"),
-                   ("L19", "Recapitulons", "A1+")]
+        lessons = [("L01", "Bonjour !", "A1"), ("L02", "Je suis", "A1"), ("L03", "J'ai", "A1"), ("L04", "Le la les", "A1"), ("L05", "Je parle", "A1"), ("L06", "Quelle heure", "A1"), ("L07", "Je vais je fais", "A1"), ("L08", "Mon ma mes", "A1"), ("L09", "Je ne pas", "A1"), ("L10", "Est-ce que", "A1"), ("L11", "Le la lui leur", "A1+"), ("L12", "Plus que", "A1+"), ("L13", "J'ai mange", "A1+"), ("L14", "Je suis alle", "A1+"), ("L15", "Quand j'etais", "A1+"), ("L16", "Je vais partir", "A1+"), ("L17", "Je voudrais", "A1+"), ("L18", "Qui que ou", "A1+"), ("L19", "Recapitulons", "A1+")]
         base_path = "fr/"
         student_suffix = "_Cuaderno.pdf"
     else:
         title = "Lecciones - Vista Profesor" if is_teacher else "Mis Lecciones"
-        lessons = [("Class 00", "Revision Class", "A1"), ("Class 01", "My Daily Routine", "A1"),
-                   ("Class 02", "Yesterday & Last Weekend", "A2"), ("Class 03", "My Last Weekend", "A2"),
-                   ("Class 04", "My Future Plans", "A2"), ("Class 05", "My Week", "A2"),
-                   ("Class 06", "My Life Experiences", "B1"), ("Class 07", "How Long Have You...?", "B1"),
-                   ("Class 08", "What Have You Been Doing?", "B1"), ("Class 09", "What Were You Doing?", "B1"),
-                   ("Class 10", "I Was Walking When...", "B1"), ("Class 11", "I Used To...", "B1"),
-                   ("Class 12", "If It Rains, I Will...", "B2"), ("Class 13", "What Would You Do If...?", "B2"),
-                   ("Class 14", "It Was Built In 1990", "B2"), ("Class 15", "She Said That...", "B2"),
-                   ("Class 16", "The Person Who...", "B2"), ("Class 17", "You Must Be Tired!", "B2"),
-                   ("Class 18", "By Next Year, I Will Have...", "B2")]
+        lessons = [("Class 00", "Revision Class", "A1"), ("Class 01", "My Daily Routine", "A1"), ("Class 02", "Yesterday and Last Weekend", "A2"), ("Class 03", "My Last Weekend", "A2"), ("Class 04", "My Future Plans", "A2"), ("Class 05", "My Week", "A2"), ("Class 06", "My Life Experiences", "B1"), ("Class 07", "How Long Have You", "B1"), ("Class 08", "What Have You Been Doing", "B1"), ("Class 09", "What Were You Doing", "B1"), ("Class 10", "I Was Walking When", "B1"), ("Class 11", "I Used To", "B1"), ("Class 12", "If It Rains I Will", "B2"), ("Class 13", "What Would You Do If", "B2"), ("Class 14", "It Was Built In 1990", "B2"), ("Class 15", "She Said That", "B2"), ("Class 16", "The Person Who", "B2"), ("Class 17", "You Must Be Tired", "B2"), ("Class 18", "By Next Year I Will Have", "B2")]
         base_path = ""
         student_suffix = "_Student.pdf"
-
     st.markdown(f'<div class="main-header">{title}</div>', unsafe_allow_html=True)
     st.markdown("### Documentos generales del curso")
     if lang == "fr":
@@ -268,8 +231,7 @@ def page_lessons():
             docs.append(("fr/progress_tracker_fr.xlsx", "Progress Tracker FR"))
             docs.append(("fr/corriges_fr.pdf", "Corriges"))
     else:
-        docs = [("00- Start_here.pdf", "Guia de inicio"), ("01- Syllabus.pdf", "Programa del curso"),
-                ("04- Preambule.pdf", "Preambulo"), ("05- Methodology_Guide.pdf", "Guia pedagogica")]
+        docs = [("00- Start_here.pdf", "Guia de inicio"), ("01- Syllabus.pdf", "Programa del curso"), ("04- Preambule.pdf", "Preambulo"), ("05- Methodology_Guide.pdf", "Guia pedagogica")]
         if is_teacher:
             docs.append(("02- Answer_Key_19_Lecons_Course_Slides.pdf", "Corriges PPTX"))
             docs.append(("03- Answer_Key_19_Lecons_Additional_Exercices.pdf", "Corriges ejercicios"))
@@ -311,32 +273,32 @@ def page_lessons():
 
 
 def page_pronunciation():
-    user = st.session_state.user
     lang = get_lang()
     st.markdown('<div class="main-header">Pronunciacion</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Escucha y practica los sonidos clave</div>', unsafe_allow_html=True)
-    data = PRONUNCIATION_DATA.get(lang, {})
-    if not data:
-        st.warning("Contenido no disponible.")
-        return
-    if lang == "fr":
-        lessons_list = [f"L{i:02d}" for i in range(1, 20)]
-    else:
-        lessons_list = [f"Class {i:02d}" for i in range(19)]
-    available = [l for l in lessons_list if l in data]
-    if not available:
-        st.warning("No hay datos disponibles.")
-        return
-    selected = st.selectbox("Leccion", available, index=0)
-    lesson_data = data[selected]
-    st.markdown(f"## {lesson_data['title']}")
-    st.info(f"Consejo: {lesson_data['tip']}")
-    st.markdown("### Palabras para practicar")
-    for word in lesson_data["words"]:
-        st.markdown(f"- {word}")
-    st.markdown("### Frases completas")
-    for phrase in lesson_data["phrases"]:
-        st.markdown(f"- {phrase}")
+    try:
+        from pronunciation_data import PRONUNCIATION_DATA
+        data = PRONUNCIATION_DATA.get(lang, {})
+        if not data:
+            st.warning("Contenido no disponible.")
+            return
+        lessons_list = [f"L{i:02d}" for i in range(1, 20)] if lang == "fr" else [f"Class {i:02d}" for i in range(19)]
+        available = [l for l in lessons_list if l in data]
+        if not available:
+            st.warning("No hay datos disponibles.")
+            return
+        selected = st.selectbox("Leccion", available, index=0)
+        lesson_data = data[selected]
+        st.markdown(f"## {lesson_data['title']}")
+        st.info(f"Consejo: {lesson_data['tip']}")
+        st.markdown("### Palabras para practicar")
+        for word in lesson_data["words"]:
+            st.markdown(f"- {word}")
+        st.markdown("### Frases completas")
+        for phrase in lesson_data["phrases"]:
+            st.markdown(f"- {phrase}")
+    except ImportError:
+        st.info("Seccion en construccion")
 
 
 def page_progress():
@@ -419,11 +381,7 @@ def page_exercises():
         status = "Corregido" if has_fb else "En espera"
         with st.expander(f"{status} - {sub['lesson']} - Ej. {sub['exercise_num']}"):
             st.markdown(f"**Enviado:** {sub['submitted_at'][:16]}")
-            if sub["answer"].startswith("Audio:") or sub["answer"].startswith("Audio :"):
-                link = sub["answer"].replace("Audio:", "").replace("Audio :", "").strip()
-                st.markdown(f"**Audio:** [Abrir en Drive]({link})")
-            else:
-                st.markdown(f'<div class="answer-box">{sub["answer"]}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="answer-box">{sub["answer"]}</div>', unsafe_allow_html=True)
             if has_fb:
                 st.success(sub["feedback"])
 
@@ -440,11 +398,7 @@ def page_submissions():
             for sub in pending:
                 with st.expander(f"{sub['full_name']} - {sub['lesson']} - Ej. {sub['exercise_num']}"):
                     st.markdown(f"**Enviado:** {sub['submitted_at'][:16]}")
-                    if sub["answer"].startswith("Audio:") or sub["answer"].startswith("Audio :"):
-                        link = sub["answer"].replace("Audio:", "").replace("Audio :", "").strip()
-                        st.markdown(f"**Audio:** [Abrir]({link})")
-                    else:
-                        st.markdown(f'<div class="answer-box">{sub["answer"]}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="answer-box">{sub["answer"]}</div>', unsafe_allow_html=True)
                     fb = st.text_area("Retroalimentacion", height=150, key=f"fb_{sub['id']}")
                     if st.button("Enviar", key=f"send_{sub['id']}", use_container_width=True):
                         if fb.strip():
@@ -485,13 +439,8 @@ def page_certificate():
         st.metric("Promedio", f"{stats['avg_score']}/10")
     with col3:
         st.metric("Asistencia", f"{stats['attendance_rate']}%")
-    st.markdown("---")
     if stats["attended"] >= stats["total"]:
         st.success("Curso completado")
-        cert = "06-Certificate.pdf"
-        if os.path.exists(cert):
-            with open(cert, "rb") as f:
-                st.download_button("Descargar certificado", f, file_name="Certificate_Ingrid.pdf", use_container_width=True)
     else:
         rem = stats["total"] - stats["attended"]
         st.warning(f"Faltan {rem} sesiones")
@@ -549,7 +498,7 @@ def main():
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Lecciones completadas", f"{stats['attended']}/{stats['total']}")
+                st.metric("Lecciones", f"{stats['attended']}/{stats['total']}")
             with col2:
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
