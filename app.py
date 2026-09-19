@@ -35,36 +35,6 @@ st.markdown("""
         text-align: center;}
     .answer-box {background: #F0F8F0; padding: 1rem; border-radius: 8px;
         border-left: 4px solid #2E7D32;}
-
-    /* SIDEBAR COMPACTE */
-    section[data-testid="stSidebar"] {
-        min-width: 230px !important;
-        max-width: 230px !important;
-    }
-    section[data-testid="stSidebar"] > div:first-child {
-        padding: 0.3rem 0.5rem !important;
-    }
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
-        gap: 0 !important;
-    }
-    section[data-testid="stSidebar"] [data-testid="element-container"] {
-        margin: 0 !important;
-    }
-    section[data-testid="stSidebar"] hr {
-        margin: 0.3rem 0 !important;
-    }
-    section[data-testid="stSidebar"] .stButton > button {
-        padding: 0.2rem 0.4rem !important;
-        font-size: 0.8rem !important;
-        border-radius: 8px !important;
-        min-height: 30px !important;
-        height: 30px !important;
-        margin: 0 0 0.15rem 0 !important;
-    }
-    section[data-testid="stSidebar"] .stButton > button p {
-        font-size: 0.8rem !important;
-        margin: 0 !important;
-    }        
 </style>
 """, unsafe_allow_html=True)
 
@@ -117,63 +87,83 @@ def page_login():
                         st.rerun()
                     else:
                         st.error("❌ Usuario o contraseña incorrectos")
+
+
 def render_sidebar():
     user = st.session_state.user
     with st.sidebar:
         st.markdown("""
-        <div style='text-align: center; padding: 0.8rem 0 0.5rem 0;'>
-            <div style='font-size: 1.3rem; font-weight: 700; color: #3D1F5C; line-height: 1.2;'>Lingua Bridge</div>
-            <div style='font-size: 0.7rem; color: #C9A227; font-style: italic; margin-top: 2px;'>Building bridges through language</div>
+        <div style='text-align: center; padding: 1rem 0;'>
+            <h2 style='color: #3D1F5C; margin-bottom: 0;'>🌉 Lingua Bridge</h2>
+            <p style='color: #C9A227; font-style: italic; font-size: 0.8rem;
+                      margin-top: 0;'>Building bridges through language</p>
         </div>
         """, unsafe_allow_html=True)
+        st.markdown("---")
 
-        st.markdown("**Curso**")
-        lang_options = {"Ingles": "en", "Frances": "fr"}
-        current_label = "Frances" if st.session_state.lang == "fr" else "Ingles"
-        selected = st.radio("", list(lang_options.keys()), index=list(lang_options.keys()).index(current_label), label_visibility="collapsed", key="lang_selector")
+        st.markdown("**🌍 Curso**")
+        lang_options = {"🇬🇧 Inglés": "en", "🇫🇷 Francés": "fr"}
+        current_label = ("🇫🇷 Francés" if st.session_state.lang == "fr"
+                          else "🇬🇧 Inglés")
+        selected = st.radio("", list(lang_options.keys()),
+                             index=list(lang_options.keys()).index(current_label),
+                             label_visibility="collapsed",
+                             key="lang_selector")
         new_lang = lang_options[selected]
         if new_lang != st.session_state.lang:
             st.session_state.lang = new_lang
             st.session_state.current_session = None
             st.rerun()
 
-        st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
+        st.markdown("---")
 
-        role_label = "PROFESOR" if user["role"] == "teacher" else "ESTUDIANTE"
-        initials = "".join([n[0] for n in user['full_name'].split()[:2]]).upper()
-
+        role_emoji = "👨‍🏫" if user["role"] == "teacher" else "👩‍🎓"
+        role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
-            <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #FF6B35; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
-            <div style='flex: 1; min-width: 0;'>
-                <div style='color: white; font-size: 0.82rem; font-weight: 600; line-height: 1.15;'>{user['full_name']}</div>
-                <div style='color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px;'>{role_label}</div>
-            </div>
+        <div style='padding: 0.5rem; background: white; border-radius: 8px;
+                    border-left: 4px solid #FF6B35;'>
+            <b>{role_emoji} {user['full_name']}</b><br>
+            <small style='color: #666;'>{role_label}</small>
         </div>
         """, unsafe_allow_html=True)
-
-        st.markdown("<div style='height: 2.5rem;'></div>", unsafe_allow_html=True)
+        st.markdown("---")
 
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
-        elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
+            menu_items = [
+                ("🏠 Panel", "dashboard"),
+                ("📬 Envíos", "submissions"),
+                ("📅 Sesiones", "sessions"),
+                ("📚 Lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
+                ("📊 Progreso", "progress"),
+                ("🎓 Certificado", "certificate"),
+                ("🔐 Cambiar contraseña", "change_password"),
+            ]
         else:
-            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
+            menu_items = [
+                ("🏠 Inicio", "dashboard"),
+                ("📚 Mis lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
+                ("✏️ Mis ejercicios", "exercises"),
+                ("📊 Mi progreso", "progress"),
+                ("📅 Mi calendario", "calendar"),
+            ]
+
         for label, key in menu_items:
             is_active = st.session_state.page == key
-            if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
+            if st.button(label, key=f"nav_{key}", use_container_width=True,
+                          type="primary" if is_active else "secondary"):
                 st.session_state.page = key
                 st.rerun()
 
-        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
-
-        if st.button("Cerrar sesion", use_container_width=True, key="logout_btn"):
+        st.markdown("---")
+        if st.button("🚪 Cerrar sesión", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
+
 
 def page_teacher_dashboard():
     st.markdown('<div class="main-header">Panel del Profesor</div>',
@@ -291,7 +281,7 @@ def page_session_live():
     with st.form("session_form"):
         attended = st.checkbox("✅ El alumno asistió",
                                 value=bool(session["attended"]))
-        score = st.slider("📊 Puntuación (0-100)", 0.0, 100.0, 50.0, 5.0)
+        score = st.slider("📊 Puntuación (0-10)", 0.0, 10.0, 5.0, 0.5)
         notes = st.text_area("📝 Observaciones",
                               value=session["notes"] or "", height=150)
         if st.form_submit_button("💾 Guardar", use_container_width=True,
@@ -313,7 +303,7 @@ def page_sessions():
             st.markdown(f"**Día:** {row['day']} · "
                         f"**Duración:** {row['duration']}")
             if row["score"] is not None:
-                st.metric("Puntuación", f"{row['score']}/100")
+                st.metric("Puntuación", f"{row['score']}/10")
             if st.button("▶️ Abrir", key=f"open_{row['session_num']}",
                           use_container_width=True):
                 st.session_state.current_session = row["session_num"]
@@ -783,7 +773,7 @@ def page_certificate():
     with col1:
         st.metric("Progreso", f"{stats['attended']}/{stats['total']}")
     with col2:
-        st.metric("Promedio", f"{stats['avg_score']}/100")
+        st.metric("Promedio", f"{stats['avg_score']}/10")
     with col3:
         st.metric("Asistencia", f"{stats['attendance_rate']}%")
     st.markdown("---")
@@ -824,9 +814,11 @@ def main():
     if not st.session_state.logged_in:
         page_login()
         return
+
     render_sidebar()
     user = st.session_state.user
     page = st.session_state.page
+
     if user["role"] == "teacher":
         if page == "dashboard":
             page_teacher_dashboard()
@@ -848,18 +840,39 @@ def main():
             page_change_password()
         else:
             page_teacher_dashboard()
-    elif user["role"] == "student":
+    else:
         if page == "dashboard":
-            st.markdown('<div class="main-header">Bienvenida, Ingrid</div>', unsafe_allow_html=True)
-            st.markdown('<div class="sub-header">Lingua Bridge Academy - Ingles y Frances</div>', unsafe_allow_html=True)
+            st.markdown('<div class="main-header">'
+                        '¡Bienvenida, Ingrid! 🌟</div>',
+                        unsafe_allow_html=True)
+            st.markdown('<div class="sub-header">'
+                        'Lingua Bridge Academy · Inglés y Francés</div>',
+                        unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Lecciones", f"{stats['attended']}/{stats['total']}")
+                st.metric("Lecciones completadas",
+                          f"{stats['attended']}/{stats['total']}")
             with col2:
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
                 st.metric("Asistencia", f"{stats['attendance_rate']}%")
+
+            st.markdown("---")
+            st.markdown("### 🎯 Siguiente lección")
+            sessions = get_all_sessions()
+            next_s = next((s for s in sessions if not s["attended"]), None)
+            if next_s:
+                st.markdown(f"""
+                <div class="metric-card">
+                    <h3 style='color: #3D1F5C; margin: 0;'>
+                        {next_s['lesson']} — {next_s['content']}
+                    </h3>
+                    <p style='color: #666;'>
+                        📅 {next_s['date']} ({next_s['day']})
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
         elif page == "lessons":
             page_lessons()
         elif page == "pronunciation":
@@ -870,10 +883,9 @@ def main():
             page_progress()
         elif page == "calendar":
             page_calendar()
-        elif user["role"] == "student":
-            page_lessons()
         else:
-            if page == "pronunciation":
-                page_pronunciation()
-            else:
-                page_lessons()
+            page_lessons()
+
+
+if __name__ == "__main__":
+    main()
