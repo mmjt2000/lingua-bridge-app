@@ -273,10 +273,88 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%);
     }
-    /* ============ SIDEBAR COMPACTE ============ */
+    /* ============ SIDEBAR ULTRA-COMPACTE ============ */
     section[data-testid="stSidebar"] {
-        min-width: 240px !important;
-        max-width: 240px !important;
+        min-width: 220px !important;
+        max-width: 220px !important;
+    }
+
+    section[data-testid="stSidebar"] > div:first-child {
+        padding: 0.3rem 0.4rem !important;
+    }
+
+    /* Réduire TOUS les gaps */
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
+        gap: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
+        gap: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Réduire les blocs de contenu */
+    section[data-testid="stSidebar"] [data-testid="element-container"] {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    /* Masquer les dividers (hr) */
+    section[data-testid="stSidebar"] hr {
+        margin: 0.2rem 0 !important;
+        border-color: #E0E7DC !important;
+    }
+
+    /* Boutons ultra-compacts */
+    section[data-testid="stSidebar"] .stButton {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button {
+        padding: 0.15rem 0.4rem !important;
+        font-size: 0.8rem !important;
+        border-radius: 6px !important;
+        min-height: 28px !important;
+        height: 28px !important;
+        line-height: 1 !important;
+        margin: 0 !important;
+        font-weight: 500 !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button p {
+        font-size: 0.8rem !important;
+        margin: 0 !important;
+    }
+
+    /* Radio compact */
+    section[data-testid="stSidebar"] .stRadio {
+        margin: 0.1rem 0 !important;
+        padding: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio > div {
+        gap: 0.3rem !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio label {
+        font-size: 0.78rem !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio label p {
+        font-size: 0.78rem !important;
+    }
+
+    /* Réduire l'espace du sélecteur radio */
+    section[data-testid="stSidebar"] label[data-baseweb="radio"] {
+        margin-bottom: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Réduire l'espacement des marqueurs */
+    section[data-testid="stSidebar"] .stMarkdown {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     section[data-testid="stSidebar"] > div:first-child {
@@ -373,21 +451,17 @@ def page_login():
 def render_sidebar():
     user = st.session_state.user
     with st.sidebar:
-        # Logo compact
+        # Logo ultra-compact (1 ligne)
         st.markdown("""
-        <div style='text-align: center; padding: 0.3rem 0;'>
-            <h3 style='color: #3D1F5C; margin: 0; font-size: 1.3rem;'>
-                Lingua Bridge
-            </h3>
-            <p style='color: #C9A227; font-style: italic; font-size: 0.7rem;
-                      margin: 0;'>Building bridges through language</p>
+        <div style='text-align: center; padding: 0; margin: 0;'>
+            <h3 style='color: #3D1F5C; margin: 0; font-size: 1.15rem;
+                       line-height: 1.2;'>Lingua Bridge</h3>
+            <p style='color: #C9A227; font-style: italic; font-size: 0.6rem;
+                      margin: 0; line-height: 1;'>Building bridges through language</p>
         </div>
         """, unsafe_allow_html=True)
 
-        # Sélecteur langue horizontal compact
-        st.markdown("<div style='font-size: 0.85rem; font-weight: 600; "
-                    "margin: 0.5rem 0 0.2rem 0;'>Curso</div>",
-                    unsafe_allow_html=True)
+        # Sélecteur langue compact
         lang_options = {"Inglés": "en", "Francés": "fr"}
         current_label = ("Francés" if st.session_state.lang == "fr"
                           else "Inglés")
@@ -402,18 +476,19 @@ def render_sidebar():
             st.session_state.current_session = None
             st.rerun()
 
-        # User info compact
+        # User info ultra-compact
         role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
         st.markdown(f"""
-        <div style='padding: 0.4rem 0.6rem; background: white;
-                    border-radius: 8px; border-left: 3px solid #FF6B35;
-                    margin: 0.5rem 0;'>
-            <b style='font-size: 0.85rem;'>{user['full_name']}</b><br>
-            <small style='color: #666; font-size: 0.75rem;'>{role_label}</small>
+        <div style='padding: 0.3rem 0.5rem; background: white;
+                    border-radius: 6px; border-left: 3px solid #FF6B35;
+                    margin: 0.25rem 0;'>
+            <b style='font-size: 0.78rem;'>{user['full_name']}</b>
+            <small style='color: #666; font-size: 0.68rem; display: block;'>
+                {role_label}</small>
         </div>
         """, unsafe_allow_html=True)
 
-        # Menu compact
+        # Menu
         if user["role"] == "teacher":
             menu_items = [
                 ("Panel", "dashboard"),
@@ -449,7 +524,6 @@ def render_sidebar():
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
-
 def page_teacher_dashboard():
     st.markdown('<div class="main-header">Panel del Profesor</div>',
                 unsafe_allow_html=True)
