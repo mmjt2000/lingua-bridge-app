@@ -104,7 +104,7 @@ def render_sidebar():
 
         st.markdown("---")
 
-        # ===== SÉLECTEUR DE LANGUE =====
+        # Sélecteur de langue
         st.markdown("**🌍 Curso / Course**")
         lang_options = {"🇬🇧 English": "en", "🇫🇷 Français": "fr"}
         current_label = "🇫🇷 Français" if st.session_state.lang == "fr" else "🇬🇧 English"
@@ -132,7 +132,7 @@ def render_sidebar():
 
         st.markdown("---")
 
-                if user["role"] == "teacher":
+        if user["role"] == "teacher":
             menu_items = [
                 ("🏠 Panel", "dashboard"),
                 ("📬 Envíos", "submissions"),
@@ -162,13 +162,13 @@ def render_sidebar():
                 st.rerun()
 
         st.markdown("---")
+
         if st.button("🚪 Cerrar sesión", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
-
 
 # ==================== DASHBOARD PROF ====================
 def page_teacher_dashboard():
