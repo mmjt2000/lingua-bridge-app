@@ -17,7 +17,7 @@ from sheets_db import (
 
 st.set_page_config(
     page_title="Lingua Bridge Academy",
-    page_icon="🌉",
+    page_icon=":bridge_at_night:",
     layout="wide",
     initial_sidebar_state="expanded"
 )
