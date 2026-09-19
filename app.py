@@ -5,6 +5,8 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import os
+import streamlit.components.v1 as components
+from pronunciation_data import PRONUNCIATION_DATA
 
 from sheets_db import (get_all_sessions, get_session_by_num, update_session,
                         get_stats, authenticate, save_submission,
@@ -130,12 +132,13 @@ def render_sidebar():
 
         st.markdown("---")
 
-        if user["role"] == "teacher":
+                if user["role"] == "teacher":
             menu_items = [
                 ("🏠 Panel", "dashboard"),
                 ("📬 Envíos", "submissions"),
                 ("📅 Sesiones", "sessions"),
                 ("📚 Lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
                 ("📊 Progreso", "progress"),
                 ("🎓 Certificado", "certificate"),
                 ("🔐 Cambiar contraseña", "change_password"),
@@ -144,6 +147,7 @@ def render_sidebar():
             menu_items = [
                 ("🏠 Inicio", "dashboard"),
                 ("📚 Mis lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
                 ("✏️ Mis ejercicios", "exercises"),
                 ("📊 Mi progreso", "progress"),
                 ("📅 Mi calendario", "calendar"),
@@ -708,7 +712,134 @@ def page_submissions():
                     st.markdown("**📝 Tu retroalimentación:**")
                     st.success(sub["feedback"])
 
+def tts_block(items, lang_code="en-US", cols=2):
+    """Affiche une grille de boutons TTS."""
+    html_items = ""
+    for item in items:
+        safe = item.replace("'", "\\'").replace('"', "&quot;")
+        html_items += f'''
+        <div class="tts-card">
+            <span class="tts-word">{item}</span>
+            <button class="tts-btn" onclick="speak('{safe}')">🔊</button>
+        </div>
+        '''
 
+    html = f"""
+    <html>
+    <head>
+    <style>
+        * {{ box-sizing: border-box; }}
+        body {{ margin: 0; padding: 0; font-family: Arial, sans-serif; }}
+        .grid {{
+            display: grid;
+            grid-template-columns: repeat({cols}, 1fr);
+            gap: 10px;
+        }}
+        .tts-card {{
+            display: flex; align-items: center; justify-content: space-between;
+            background: white; border-radius: 8px; padding: 12px 16px;
+            border-left: 4px solid #3D1F5C; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }}
+        .tts-word {{ font-size: 16px; color: #333; font-weight: 500; }}
+        .tts-btn {{
+            background: #3D1F5C; color: white; border: none;
+            border-radius: 50%; width: 40px; height: 40px;
+            cursor: pointer; font-size: 18px; flex-shrink: 0;
+            transition: all 0.2s;
+        }}
+        .tts-btn:hover {{ background: #FF6B35; transform: scale(1.1); }}
+        .tts-btn:active {{ transform: scale(0.95); }}
+    </style>
+    </head>
+    <body>
+    <div class="grid">
+        {html_items}
+    </div>
+    <script>
+    function speak(text) {{
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = '{lang_code}';
+        u.rate = 0.8;
+        u.pitch = 1.0;
+        u.volume = 1.0;
+        speechSynthesis.speak(u);
+    }}
+    </script>
+    </body>
+    </html>
+    """
+    # Hauteur dynamique
+    rows = (len(items) + cols - 1) // cols
+    height = rows * 70 + 20
+    components.html(html, height=height)
+
+
+def page_pronunciation():
+    user = st.session_state.user
+    lang = get_lang()
+
+    st.markdown('<div class="main-header">🎤 Pronunciación</div>',
+                unsafe_allow_html=True)
+    st.markdown(
+        '<div class="sub-header">Escucha y practica los sonidos clave</div>',
+        unsafe_allow_html=True)
+
+    st.info("👉 **Cómo usar:** haz clic en 🔊 para escuchar. "
+            "Repite en voz alta. Vuelve a escuchar. "
+            "Usa auriculares para mejor calidad.")
+
+    data = PRONUNCIATION_DATA.get(lang, {})
+
+    if not data:
+        st.warning("Contenido no disponible.")
+        return
+
+    # ============ SÉLECTEUR DE LEÇON ============
+    if lang == "fr":
+        lessons_list = [f"L{i:02d}" for i in range(1, 20)]
+        base_label = "Leçon"
+    else:
+        lessons_list = [f"Class {i:02d}" for i in range(19)]
+        base_label = "Class"
+
+    # Trouver les leçons qui ont des données
+    available = [l for l in lessons_list if l in data]
+
+    if not available:
+        st.warning("Aucune donnée de prononciation pour le moment.")
+        return
+
+    selected = st.selectbox(f"📚 {base_label}", available,
+                              index=0, key="pron_lesson")
+
+    lesson_data = data[selected]
+
+    st.markdown("---")
+    st.markdown(f"## 🔊 {lesson_data['title']}")
+    st.info(f"💡 **Tip:** {lesson_data['tip']}")
+
+    # ============ MOTS ============
+    st.markdown("### 📝 Mots à pratiquer")
+    tts_block(lesson_data["words"], lang_code="en-US" if lang == "en" else "fr-FR", cols=2)
+
+    st.markdown("---")
+
+    # ============ PHRASES ============
+    st.markdown("### 💬 Phrases complètes")
+    tts_block(lesson_data["phrases"],
+              lang_code="en-US" if lang == "en" else "fr-FR", cols=1)
+
+    st.markdown("---")
+    st.markdown("### 🎯 Ton tour !")
+    st.markdown("**Répète chaque mot 3 fois en voix haute.**")
+    st.markdown("**Puis enregistre-toi dans 'Mis ejercicios' → onglet Audio.**")
+
+    # Bonus pour le prof
+    if user["role"] == "teacher":
+        st.markdown("---")
+        st.markdown("### 👨‍🏫 Notes prof")
+        st.caption("Observer la précision, corriger max 2 sons par session.")
 # ==================== CALENDRIER ====================
 def page_calendar():
     st.markdown('<div class="main-header">📅 Mi calendario</div>',
@@ -789,10 +920,12 @@ def main():
             page_submissions()
         elif page == "session_live":
             page_session_live()
-        elif page == "sessions":
+               elif page == "sessions":
             page_sessions()
         elif page == "lessons":
             page_lessons()
+        elif page == "pronunciation":
+            page_pronunciation()
         elif page == "progress":
             page_progress()
         elif page == "certificate":
@@ -813,8 +946,10 @@ def main():
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
                 st.metric("Asistencia", f"{stats['attendance_rate']}%")
-        elif page == "lessons":
+               elif page == "lessons":
             page_lessons()
+        elif page == "pronunciation":
+            page_pronunciation()
         elif page == "exercises":
             page_exercises()
         elif page == "progress":
