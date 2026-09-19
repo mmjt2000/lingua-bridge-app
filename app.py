@@ -720,7 +720,7 @@ def page_certificate():
 # =====================================================================
 def page_change_password():
     import time
-        from sheets_db import change_password
+    from sheets_db import change_password
 
     st.markdown('<div class="main-header">🔐 Cambiar contraseña</div>',
                 unsafe_allow_html=True)
@@ -740,6 +740,7 @@ def page_change_password():
                 st.success("✅ Contraseña cambiada")
                 st.info("Cierra sesión y vuelve a entrar con la nueva contraseña.")
                 time.sleep(2)
+
 
 
 def main():
