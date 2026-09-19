@@ -351,7 +351,7 @@ def render_sidebar():
     with st.sidebar:
         st.markdown("""
         <div style='text-align: center; padding: 1rem 0;'>
-            <h2 style='color: #3D1F5C; margin-bottom: 0;'>🌉 Lingua Bridge</h2>
+            <h2 style='color: #3D1F5C; margin-bottom: 0;'> Lingua Bridge</h2>
             <p style='color: #C9A227; font-style: italic; font-size: 0.8rem;
                       margin-top: 0;'>Building bridges through language</p>
         </div>
