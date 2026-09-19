@@ -10,13 +10,33 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive"
 ]
 
-
 @st.cache_resource
 def get_client():
     creds_dict = dict(st.secrets["gcp_service_account"])
     creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
     return gspread.authorize(creds)
 
+
+@st.cache_resource(ttl=60)
+def _get_spreadsheet():
+    """Cache la connexion au spreadsheet pour 60 sec."""
+    client = get_client()
+    sheet_id = st.secrets["google_sheet"]["sheet_id"]
+    return client.open_by_key(sheet_id)
+
+
+def get_sheet(name):
+    """Retourne l'onglet selon la langue active."""
+    spreadsheet = _get_spreadsheet()
+
+    lang = get_lang()
+    if lang == "fr":
+        if name == "sessions":
+            name = "sessions_fr"
+        elif name == "submissions":
+            name = "submissions_fr"
+
+    return spreadsheet.worksheet(name)
 
 def get_lang():
     """Retourne la langue active : 'en' ou 'fr'."""
@@ -78,7 +98,25 @@ def get_all_users():
 
 
 # ==================== SESSIONS ====================
+@st.cache_data(ttl=10)
 def get_all_sessions():
+    sheet = get_sheet("sessions")
+    sessions = []
+    for r in sheet.get_all_records():
+        sessions.append({
+            "session_num": r["session_num"],
+            "week": int(r["week"]) if r["week"] != "" else 0,
+            "date": r["date"],
+            "day": r["day"],
+            "lesson": r["lesson"],
+            "content": r["content"],
+            "duration": r["duration"],
+            "attended": int(r["attended"]) if r["attended"] != "" else 0,
+            "score": float(r["score"]) if r["score"] != "" else None,
+            "notes": r["notes"] if r["notes"] != "" else None
+        })
+    return sessions
+    def get_all_sessions():
     sheet = get_sheet("sessions")
     sessions = []
     for r in sheet.get_all_records():
@@ -114,7 +152,7 @@ def update_session(session_num, attended, score=None, notes=None):
             return True
     return False
 
-
+@st.cache_data(ttl=10)
 def get_stats():
     sessions = get_all_sessions()
     total = len(sessions)
