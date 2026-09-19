@@ -870,10 +870,10 @@ def main():
             page_progress()
         elif page == "calendar":
             page_calendar()
-        else:
+        elif user["role"] == "student":
             page_lessons()
-    else:
-        if page == "pronunciation":
-            page_pronunciation()
         else:
-            page_lessons()
+            if page == "pronunciation":
+                page_pronunciation()
+            else:
+                page_lessons()
