@@ -24,17 +24,274 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .main-header {color: #3D1F5C; font-size: 2.5rem; font-weight: bold;
-        text-align: center; padding: 1rem 0;}
-    .sub-header {color: #FF6B35; font-size: 1.2rem; text-align: center;
-        font-style: italic; margin-bottom: 2rem;}
-    .metric-card {background: white; padding: 1rem; border-radius: 10px;
-        border-left: 5px solid #3D1F5C; margin: 0.5rem 0;}
-    .lesson-banner {background: #3D1F5C; color: white; padding: 1rem;
-        border-radius: 10px; font-size: 1.5rem; font-weight: bold;
-        text-align: center;}
-    .answer-box {background: #F0F8F0; padding: 1rem; border-radius: 8px;
-        border-left: 4px solid #2E7D32;}
+    /* ============ GOOGLE FONTS ============ */
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+    /* ============ GLOBAL ============ */
+    html, body, [class*="css"] {
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    .stApp {
+        background: linear-gradient(135deg, #E2EFDA 0%, #F5F9F2 100%);
+    }
+
+    /* ============ HEADERS ============ */
+    .main-header {
+        color: #3D1F5C;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-align: center;
+        padding: 1.5rem 0 1rem 0;
+        letter-spacing: -0.5px;
+        text-shadow: 0 2px 4px rgba(61, 31, 92, 0.08);
+    }
+
+    .sub-header {
+        color: #FF6B35;
+        font-size: 1.1rem;
+        text-align: center;
+        font-weight: 400;
+        font-style: italic;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    /* ============ CARDS ============ */
+    .metric-card {
+        background: linear-gradient(135deg, #FFFFFF 0%, #FAFCF8 100%);
+        padding: 1.25rem 1.5rem;
+        border-radius: 16px;
+        border-left: 5px solid #3D1F5C;
+        margin: 0.75rem 0;
+        box-shadow: 0 4px 20px rgba(61, 31, 92, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 28px rgba(61, 31, 92, 0.15);
+    }
+
+    /* ============ LESSON BANNER ============ */
+    .lesson-banner {
+        background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%);
+        color: white;
+        padding: 1.25rem;
+        border-radius: 16px;
+        font-size: 1.5rem;
+        font-weight: 600;
+        text-align: center;
+        box-shadow: 0 6px 24px rgba(61, 31, 92, 0.3);
+        letter-spacing: 0.5px;
+    }
+
+    /* ============ ANSWER BOX ============ */
+    .answer-box {
+        background: linear-gradient(135deg, #F0F8F0 0%, #E8F5E9 100%);
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        border-left: 4px solid #2E7D32;
+        box-shadow: inset 0 1px 3px rgba(46, 125, 50, 0.1);
+        color: #1B5E20;
+    }
+
+    /* ============ METRICS ============ */
+    div[data-testid="stMetric"] {
+        background: white;
+        padding: 1rem 1.25rem;
+        border-radius: 14px;
+        box-shadow: 0 4px 16px rgba(61, 31, 92, 0.06);
+        border-top: 3px solid #FF6B35;
+        transition: all 0.3s ease;
+    }
+
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(255, 107, 53, 0.15);
+        border-top-color: #3D1F5C;
+    }
+
+    div[data-testid="stMetricValue"] {
+        color: #3D1F5C;
+        font-weight: 700;
+        font-size: 2rem;
+    }
+
+    div[data-testid="stMetricLabel"] {
+        color: #666;
+        font-weight: 500;
+    }
+
+    /* ============ BUTTONS ============ */
+    .stButton > button {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        font-family: 'Poppins', sans-serif !important;
+        transition: all 0.25s ease !important;
+        border: 1.5px solid transparent !important;
+        padding: 0.5rem 1rem !important;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(61, 31, 92, 0.2) !important;
+    }
+
+    .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%) !important;
+        color: white !important;
+        box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25) !important;
+    }
+
+    /* ============ DOWNLOAD BUTTONS ============ */
+    .stDownloadButton > button {
+        background: white !important;
+        color: #3D1F5C !important;
+        border: 1.5px solid #3D1F5C !important;
+        border-radius: 12px !important;
+        font-weight: 500 !important;
+        transition: all 0.25s ease !important;
+    }
+
+    .stDownloadButton > button:hover {
+        background: #3D1F5C !important;
+        color: white !important;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(61, 31, 92, 0.2) !important;
+    }
+
+    /* ============ EXPANDERS ============ */
+    .streamlit-expanderHeader {
+        background: white !important;
+        border-radius: 12px !important;
+        font-weight: 500 !important;
+        border: 1px solid #E0E7DC !important;
+        transition: all 0.2s ease !important;
+    }
+
+    .streamlit-expanderHeader:hover {
+        background: #FAFCF8 !important;
+        border-color: #3D1F5C !important;
+    }
+
+    /* ============ SIDEBAR ============ */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #FFFFFF 0%, #F5F9F2 100%);
+        border-right: 1px solid #E0E7DC;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button {
+        border-radius: 10px !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* ============ TABS ============ */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+        background: white;
+        padding: 6px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(61, 31, 92, 0.05);
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* ============ INPUTS ============ */
+    .stTextInput input, .stTextArea textarea, .stSelectbox select {
+        border-radius: 10px !important;
+        border: 1.5px solid #E0E7DC !important;
+        transition: all 0.2s ease !important;
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #3D1F5C !important;
+        box-shadow: 0 0 0 3px rgba(61, 31, 92, 0.1) !important;
+    }
+
+    /* ============ FORMS ============ */
+    .stForm {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(61, 31, 92, 0.06);
+    }
+
+    /* ============ INFO BOXES ============ */
+    .stAlert {
+        border-radius: 12px !important;
+        border-left-width: 5px !important;
+    }
+
+    /* ============ TTS CARDS ============ */
+    .tts-card {
+        background: white !important;
+        border-radius: 12px !important;
+        padding: 14px 18px !important;
+        border-left: 5px solid #3D1F5C !important;
+        box-shadow: 0 4px 16px rgba(61, 31, 92, 0.08) !important;
+        transition: all 0.25s ease !important;
+    }
+
+    .tts-card:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 24px rgba(61, 31, 92, 0.15) !important;
+        border-left-color: #FF6B35 !important;
+    }
+
+    .tts-btn {
+        background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%) !important;
+        box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25) !important;
+    }
+
+    .tts-btn:hover {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%) !important;
+        box-shadow: 0 6px 20px rgba(255, 107, 53, 0.35) !important;
+    }
+
+    /* ============ DIVIDERS ============ */
+    hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #E0E7DC, transparent);
+        margin: 1.5rem 0;
+    }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .main-header, .metric-card, .lesson-banner {
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    /* ============ SCROLLBAR ============ */
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #F0F5EC;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%);
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -54,7 +311,7 @@ if "lang" not in st.session_state:
 def page_login():
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        st.markdown("<div style='height: 3rem;'></div>",
+        st.markdst.markdown("""own("<div style='height: 3rem;'></div>",
                     unsafe_allow_html=True)
         st.markdown("""
         <div style='text-align: center;'>
