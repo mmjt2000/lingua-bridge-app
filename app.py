@@ -895,6 +895,11 @@ def main():
             page_calendar()
         else:
             page_lessons()
+            if user["role"] == "guest":
+        if page == "pronunciation":
+            page_pronunciation()
+        else:
+            page_lessons()
 
 
 if __name__ == "__main__":
