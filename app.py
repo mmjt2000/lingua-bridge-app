@@ -451,46 +451,49 @@ def render_sidebar():
         # ===== CARTE UTILISATEUR PRO =====
         if user["role"] == "teacher":
             role_label = "PROFESOR"
-            role_color = "#3D1F5C"
-            avatar = "JT"
+            role_color = "#FFD54F"
         else:
             role_label = "ESTUDIANTE"
-            role_color = "#FF6B35"
-            avatar = "IS"
+            role_color = "#FFD54F"
 
-        # Récupère initiales
+        # Initiales
         names = user['full_name'].split()
-        avatar = (names[0][0] + names[-1][0]).upper() if len(names) >= 2 else names[0][:2].upper()
+        if len(names) >= 2:
+            avatar = (names[0][0] + names[-1][0]).upper()
+        else:
+            avatar = names[0][:2].upper()
 
+        # Nom affiché sur 2 lignes maximum
         st.markdown(f"""
         <div style='background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%);
-                    border-radius: 10px; padding: 0.6rem 0.7rem; margin: 0.4rem 0;
-                    box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25);'>
-            <div style='display: flex; align-items: center; gap: 0.5rem;'>
-                <div style='width: 32px; height: 32px; border-radius: 50%;
+                    border-radius: 12px; padding: 0.8rem 0.7rem;
+                    margin: 0.5rem 0 0.8rem 0;
+                    box-shadow: 0 4px 14px rgba(61, 31, 92, 0.3);'>
+            <div style='display: flex; align-items: center; gap: 0.6rem;'>
+                <div style='width: 38px; height: 38px; border-radius: 50%;
                             background: white; color: #3D1F5C;
                             display: flex; align-items: center;
                             justify-content: center; font-weight: 700;
-                            font-size: 0.8rem; flex-shrink: 0;'>
+                            font-size: 0.85rem; flex-shrink: 0;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.15);'>
                     {avatar}
                 </div>
                 <div style='flex: 1; min-width: 0;'>
-                    <div style='color: white; font-size: 0.78rem;
-                                font-weight: 600; line-height: 1.2;
-                                white-space: nowrap; overflow: hidden;
-                                text-overflow: ellipsis;'>
+                    <div style='color: white; font-size: 0.8rem;
+                                font-weight: 600; line-height: 1.25;
+                                word-break: break-word;'>
                         {user['full_name']}
                     </div>
-                    <div style='color: #C9A227; font-size: 0.62rem;
-                                font-weight: 600; letter-spacing: 0.5px;
-                                line-height: 1;'>
+                    <div style='color: {role_color}; font-size: 0.62rem;
+                                font-weight: 700; letter-spacing: 0.6px;
+                                line-height: 1; margin-top: 2px;'>
                         {role_label}
                     </div>
                 </div>
             </div>
         </div>
         """, unsafe_allow_html=True)
-
+        
         # ===== MENU =====
         if user["role"] == "teacher":
             menu_items = [
