@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Google Sheets database backend"""
+"""Google Sheets database backend — multi-langue (EN / FR)"""
 import streamlit as st
 import gspread
 from google.oauth2.service_account import Credentials
@@ -18,13 +18,28 @@ def get_client():
     return gspread.authorize(creds)
 
 
+def get_lang():
+    """Retourne la langue active : 'en' ou 'fr'."""
+    return st.session_state.get("lang", "en")
+
+
 def get_sheet(name):
+    """Retourne l'onglet selon la langue active."""
     client = get_client()
     sheet_id = st.secrets["google_sheet"]["sheet_id"]
     spreadsheet = client.open_by_key(sheet_id)
+
+    lang = get_lang()
+    if lang == "fr":
+        if name == "sessions":
+            name = "sessions_fr"
+        elif name == "submissions":
+            name = "submissions_fr"
+
     return spreadsheet.worksheet(name)
 
 
+# ==================== USERS (partagé) ====================
 def authenticate(username, password):
     sheet = get_sheet("users")
     for r in sheet.get_all_records():
@@ -62,6 +77,7 @@ def get_all_users():
     ]
 
 
+# ==================== SESSIONS ====================
 def get_all_sessions():
     sheet = get_sheet("sessions")
     sessions = []
@@ -110,6 +126,7 @@ def get_stats():
             "avg_score": avg, "attendance_rate": rate}
 
 
+# ==================== SUBMISSIONS ====================
 def save_submission(student_id, lesson, exercise_num, answer):
     sheet = get_sheet("submissions")
     records = sheet.get_all_records()
