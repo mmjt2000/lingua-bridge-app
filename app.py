@@ -9,10 +9,11 @@ import plotly.express as px
 from datetime import datetime
 import os
 
-from database import (get_all_sessions, get_session_by_num, update_session,
-                       get_stats, authenticate, save_submission,
-                       get_student_submissions, get_pending_submissions,
-                       get_all_submissions_with_feedback, save_feedback)
+from sheets_db import (get_all_sessions, get_session_by_num, update_session,
+                        get_stats, authenticate, save_submission,
+                        get_student_submissions, get_pending_submissions,
+                        get_all_submissions_with_feedback, save_feedback,
+                        change_password)
 
 # Auto-init de la base de données (pour Streamlit Cloud)
 if not os.path.exists("lingua_bridge.db"):
@@ -719,7 +720,7 @@ def page_certificate():
 # =====================================================================
 def page_change_password():
     import time
-    from database import change_password
+        from sheets_db import change_password
 
     st.markdown('<div class="main-header">🔐 Cambiar contraseña</div>',
                 unsafe_allow_html=True)
