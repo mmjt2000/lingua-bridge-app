@@ -143,7 +143,7 @@ def render_sidebar():
         initials = "".join([n[0] for n in user['full_name'].split()[:2]]).upper()
 
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
+        <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%)); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
             <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #3D1F5C; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
             <div style='flex: 1; min-width: 0;'>
                 <div style='color: white; font-size: 0.82rem; font-weight: 600; line-height: 1.15;'>{user['full_name']}</div>
@@ -152,7 +152,7 @@ def render_sidebar():
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
+            st.markdown("<div style='height: 2.5rem;'></div>", unsafe_allow_html=True)
 
         if user["role"] == "teacher":
             menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
