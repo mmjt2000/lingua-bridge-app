@@ -837,10 +837,7 @@ def main():
             page_certificate()
         elif page == "change_password":
             page_change_password()
-    elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
-        else:
-            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
+    
     elif user["role"] == "student":
         if page == "dashboard":
             st.markdown('<div class="main-header">Bienvenida, Ingrid</div>', unsafe_allow_html=True)
