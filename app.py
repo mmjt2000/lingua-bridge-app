@@ -590,24 +590,45 @@ def page_exercises():
             exercise_num_audio = st.number_input("Número de ejercicio",
                                                    1, 20, 1, key="ex_audio")
 
-        # Widget d'enregistrement audio
-        audio_value = st.audio_input("🎤 Graba tu audio")
+                # ============ MÉTHODE 1 : Enregistrement direct ============
+        st.markdown("**🎤 Opción 1: Graba directamente (limitado a 30 sec)**")
+        audio_value = st.audio_input("🎤 Graba tu audio", key="recorder")
+
+        # ============ MÉTHODE 2 : Upload de fichier ============
+        st.markdown("---")
+        st.markdown("**📁 Opción 2: Sube un audio grabado con tu teléfono**")
+        st.caption("Graba con la app de tu teléfono y súbelo aquí")
+
+        uploaded_file = st.file_uploader(
+            "Selecciona tu archivo de audio",
+            type=["wav", "mp3", "m4a", "ogg"],
+            key="uploader"
+        )
+
+        # ============ TRAITEMENT ============
+        audio_bytes = None
+        source = None
 
         if audio_value is not None:
-            st.audio(audio_value, format="audio/wav")
+            st.audio(audio_value)
+            audio_bytes = audio_value.getvalue()
+            source = "direct"
 
+        if uploaded_file is not None:
+            st.audio(uploaded_file)
+            audio_bytes = uploaded_file.getvalue()
+            source = "upload"
+
+        # ============ BOUTON D'ENVOI ============
+        if audio_bytes is not None:
             if st.button("📤 Enviar audio al profesor",
                           use_container_width=True, type="primary"):
                 try:
-                    audio_bytes = audio_value.getvalue()
-                    filename = (f"L{lesson_audio[1:]}_Ej{exercise_num_audio}_"
-                                f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+                    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                     if lang == "fr":
-                        filename = (f"FR_{lesson_audio}_Ej{exercise_num_audio}_"
-                                    f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+                        filename = f"FR_{lesson_audio}_Ej{exercise_num_audio}_{timestamp}.wav"
                     else:
-                        filename = (f"EN_{lesson_audio.replace(' ', '')}_Ej{exercise_num_audio}_"
-                                    f"{datetime.now().strftime('%Y%m%d_%H%M%S')}.wav")
+                        filename = f"EN_{lesson_audio.replace(' ', '')}_Ej{exercise_num_audio}_{timestamp}.wav"
 
                     save_audio_submission(
                         student_id, lesson_audio, exercise_num_audio,
