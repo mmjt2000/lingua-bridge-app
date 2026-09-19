@@ -142,12 +142,12 @@ def render_sidebar():
         role_label = "PROFESOR" if user["role"] == "teacher" else "ESTUDIANTE"
         initials = "".join([n[0] for n in user['full_name'].split()[:2]]).upper()
 
-        st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%)); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
-            <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #3D1F5C; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
+               st.markdown(f"""
+        <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
+            <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #FF6B35; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
             <div style='flex: 1; min-width: 0;'>
                 <div style='color: white; font-size: 0.82rem; font-weight: 600; line-height: 1.15;'>{user['full_name']}</div>
-                <div style='color: #FFD54F; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px;'>{role_label}</div>
+                <div style='color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px;'>{role_label}</div>
             </div>
         </div>
         """, unsafe_allow_html=True)
