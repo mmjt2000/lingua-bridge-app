@@ -399,13 +399,15 @@ def page_lessons():
         st.markdown("### 📁 Documents généraux du cours de français")
         st.caption("Programme, méthodologie et ressources")
 
-        general_docs_fr = [
+    general_docs_fr = [
             ("fr/syllabus_fr.pdf", "📅 Programme du cours"),
+            ("fr/methodology_guide_fr.pdf", "🎓 Guide pédagogique"),
         ]
         if is_teacher:
             general_docs_fr.append(
                 ("fr/progress_tracker_fr.xlsx", "📊 Progress Tracker FR"))
-
+            general_docs_fr.append(
+                ("fr/corriges_fr.pdf", "✅ Corrigés des exercices"))
         cols = st.columns(2)
         for i, (filename, label) in enumerate(general_docs_fr):
             with cols[i % 2]:
