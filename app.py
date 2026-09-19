@@ -12,7 +12,7 @@ from sheets_db import get_all_sessions, get_session_by_num, update_session, get_
 
 st.set_page_config(
     page_title="Lingua Bridge Academy",
-    page_icon="🌉",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -54,7 +54,7 @@ def page_login():
         st.markdown("""
         <div style='text-align: center;'>
             <h1 style='color: #3D1F5C; font-size: 3rem; margin-bottom: 0;'>
-                🌉 Lingua Bridge Academy
+                 Lingua Bridge Academy
             </h1>
             <p style='color: #C9A227; font-style: italic; margin-top: 0;'>
                 Building bridges through language
@@ -89,7 +89,7 @@ def render_sidebar():
     with st.sidebar:
         st.markdown("""
         <div style='text-align: center; padding: 1rem 0;'>
-            <h2 style='color: #3D1F5C; margin-bottom: 0;'>🌉 Lingua Bridge</h2>
+            <h2 style='color: #3D1F5C; margin-bottom: 0;'> Lingua Bridge</h2>
             <p style='color: #C9A227; font-style: italic; font-size: 0.8rem;
                       margin-top: 0;'>Building bridges through language</p>
         </div>
