@@ -273,126 +273,98 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%);
     }
-    /* ============ SIDEBAR ULTRA-COMPACTE ============ */
+    /* ============ SIDEBAR PRO ============ */
     section[data-testid="stSidebar"] {
-        min-width: 220px !important;
-        max-width: 220px !important;
+        min-width: 230px !important;
+        max-width: 230px !important;
+        background: linear-gradient(180deg, #FFFFFF 0%, #F9FCF6 100%) !important;
+        border-right: 1px solid #E0E7DC !important;
     }
 
     section[data-testid="stSidebar"] > div:first-child {
-        padding: 0.3rem 0.4rem !important;
+        padding: 0.6rem 0.7rem !important;
     }
 
-    /* Réduire TOUS les gaps */
+    /* Espacement vertical harmonieux */
     section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {
         gap: 0 !important;
     }
 
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
-        gap: 0 !important;
-        margin: 0 !important;
-    }
-
-    /* Réduire les blocs de contenu */
     section[data-testid="stSidebar"] [data-testid="element-container"] {
-        margin-bottom: 0 !important;
-        margin-top: 0 !important;
-    }
-
-    /* Masquer les dividers (hr) */
-    section[data-testid="stSidebar"] hr {
-        margin: 0.2rem 0 !important;
-        border-color: #E0E7DC !important;
-    }
-
-    /* Boutons ultra-compacts */
-    section[data-testid="stSidebar"] .stButton {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    section[data-testid="stSidebar"] .stButton > button {
-        padding: 0.15rem 0.4rem !important;
-        font-size: 0.8rem !important;
-        border-radius: 6px !important;
-        min-height: 28px !important;
-        height: 28px !important;
-        line-height: 1 !important;
-        margin: 0 !important;
-        font-weight: 500 !important;
-    }
-
-    section[data-testid="stSidebar"] .stButton > button p {
-        font-size: 0.8rem !important;
         margin: 0 !important;
     }
 
-    /* Radio compact */
+    /* Radio buttons langue */
     section[data-testid="stSidebar"] .stRadio {
-        margin: 0.1rem 0 !important;
+        margin: 0.2rem 0 0.5rem 0 !important;
         padding: 0 !important;
-    }
-
-    section[data-testid="stSidebar"] .stRadio > div {
-        gap: 0.3rem !important;
-    }
-
-    section[data-testid="stSidebar"] .stRadio label {
-        font-size: 0.78rem !important;
-    }
-
-    section[data-testid="stSidebar"] .stRadio label p {
-        font-size: 0.78rem !important;
-    }
-
-    /* Réduire l'espace du sélecteur radio */
-    section[data-testid="stSidebar"] label[data-baseweb="radio"] {
-        margin-bottom: 0 !important;
-        padding: 0 !important;
-    }
-
-    /* Réduire l'espacement des marqueurs */
-    section[data-testid="stSidebar"] .stMarkdown {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-
-    section[data-testid="stSidebar"] > div:first-child {
-        padding: 0.5rem 0.6rem !important;
-    }
-
-    section[data-testid="stSidebar"] .stButton {
-        margin-bottom: 0 !important;
-    }
-
-    section[data-testid="stSidebar"] .stButton > button {
-        padding: 0.35rem 0.5rem !important;
-        font-size: 0.88rem !important;
-        border-radius: 8px !important;
-        min-height: 34px !important;
-        height: 34px !important;
-        margin-bottom: 0.15rem !important;
-    }
-
-    section[data-testid="stSidebar"] hr {
-        margin: 0.5rem 0 !important;
-    }
-
-    section[data-testid="stSidebar"] .stRadio {
-        margin-bottom: 0 !important;
     }
 
     section[data-testid="stSidebar"] .stRadio > div {
         gap: 0.4rem !important;
+        justify-content: center !important;
     }
 
     section[data-testid="stSidebar"] .stRadio label {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+        color: #3D1F5C !important;
     }
 
-    /* Réduire l'espace entre les blocs */
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
-        gap: 0.15rem !important;
+    section[data-testid="stSidebar"] .stRadio label p {
+        font-size: 0.8rem !important;
+        font-weight: 600 !important;
+    }
+
+    /* Boutons du menu */
+    section[data-testid="stSidebar"] .stButton {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button {
+        padding: 0 !important;
+        font-size: 0.82rem !important;
+        border-radius: 8px !important;
+        min-height: 32px !important;
+        height: 32px !important;
+        line-height: 1 !important;
+        margin: 0 0 0.2rem 0 !important;
+        font-weight: 500 !important;
+        border: 1.5px solid #E0E7DC !important;
+        background: white !important;
+        color: #3D1F5C !important;
+        transition: all 0.2s ease !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button:hover {
+        background: #FAFCF8 !important;
+        border-color: #3D1F5C !important;
+        transform: translateX(2px) !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button[kind="primary"] {
+        background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%) !important;
+        color: white !important;
+        border-color: transparent !important;
+        box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25) !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button p {
+        font-size: 0.82rem !important;
+        margin: 0 !important;
+        font-weight: 500 !important;
+    }
+
+    /* Pas de dividers dans la sidebar */
+    section[data-testid="stSidebar"] hr {
+        display: none !important;
+    }
+
+    /* Markdown compact */
+    section[data-testid="stSidebar"] .stMarkdown {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -451,17 +423,17 @@ def page_login():
 def render_sidebar():
     user = st.session_state.user
     with st.sidebar:
-        # Logo ultra-compact (1 ligne)
+        # ===== LOGO COMPACT =====
         st.markdown("""
-        <div style='text-align: center; padding: 0; margin: 0;'>
-            <h3 style='color: #3D1F5C; margin: 0; font-size: 1.15rem;
-                       line-height: 1.2;'>Lingua Bridge</h3>
-            <p style='color: #C9A227; font-style: italic; font-size: 0.6rem;
-                      margin: 0; line-height: 1;'>Building bridges through language</p>
+        <div style='text-align: center; padding: 0; margin: 0 0 0.3rem 0;'>
+            <div style='font-size: 1.1rem; font-weight: 700; color: #3D1F5C;
+                        line-height: 1.1;'>Lingua Bridge</div>
+            <div style='font-size: 0.6rem; color: #C9A227;
+                        font-style: italic; line-height: 1;'>Building bridges</div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Sélecteur langue compact
+        # ===== SÉLECTEUR LANGUE =====
         lang_options = {"Inglés": "en", "Francés": "fr"}
         current_label = ("Francés" if st.session_state.lang == "fr"
                           else "Inglés")
@@ -476,19 +448,50 @@ def render_sidebar():
             st.session_state.current_session = None
             st.rerun()
 
-        # User info ultra-compact
-        role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
+        # ===== CARTE UTILISATEUR PRO =====
+        if user["role"] == "teacher":
+            role_label = "PROFESOR"
+            role_color = "#3D1F5C"
+            avatar = "JT"
+        else:
+            role_label = "ESTUDIANTE"
+            role_color = "#FF6B35"
+            avatar = "IS"
+
+        # Récupère initiales
+        names = user['full_name'].split()
+        avatar = (names[0][0] + names[-1][0]).upper() if len(names) >= 2 else names[0][:2].upper()
+
         st.markdown(f"""
-        <div style='padding: 0.3rem 0.5rem; background: white;
-                    border-radius: 6px; border-left: 3px solid #FF6B35;
-                    margin: 0.25rem 0;'>
-            <b style='font-size: 0.78rem;'>{user['full_name']}</b>
-            <small style='color: #666; font-size: 0.68rem; display: block;'>
-                {role_label}</small>
+        <div style='background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%);
+                    border-radius: 10px; padding: 0.6rem 0.7rem; margin: 0.4rem 0;
+                    box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25);'>
+            <div style='display: flex; align-items: center; gap: 0.5rem;'>
+                <div style='width: 32px; height: 32px; border-radius: 50%;
+                            background: white; color: #3D1F5C;
+                            display: flex; align-items: center;
+                            justify-content: center; font-weight: 700;
+                            font-size: 0.8rem; flex-shrink: 0;'>
+                    {avatar}
+                </div>
+                <div style='flex: 1; min-width: 0;'>
+                    <div style='color: white; font-size: 0.78rem;
+                                font-weight: 600; line-height: 1.2;
+                                white-space: nowrap; overflow: hidden;
+                                text-overflow: ellipsis;'>
+                        {user['full_name']}
+                    </div>
+                    <div style='color: #C9A227; font-size: 0.62rem;
+                                font-weight: 600; letter-spacing: 0.5px;
+                                line-height: 1;'>
+                        {role_label}
+                    </div>
+                </div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Menu
+        # ===== MENU =====
         if user["role"] == "teacher":
             menu_items = [
                 ("Panel", "dashboard"),
@@ -517,6 +520,7 @@ def render_sidebar():
                 st.session_state.page = key
                 st.rerun()
 
+        # ===== LOGOUT =====
         if st.button("Cerrar sesión", use_container_width=True,
                       key="logout_btn"):
             st.session_state.logged_in = False
@@ -524,6 +528,7 @@ def render_sidebar():
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
+
 def page_teacher_dashboard():
     st.markdown('<div class="main-header">Panel del Profesor</div>',
                 unsafe_allow_html=True)
