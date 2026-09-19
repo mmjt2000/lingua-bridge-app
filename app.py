@@ -73,7 +73,8 @@ def page_login():
         with st.form("login_form"):
             username = st.text_input("Usuario")
             password = st.text_input("Contraseña", type="password")
-            submit = st.form_submit_button("Entrar", use_container_width=True)
+            submit = st.form_submit_button("Entrar",
+                                             use_container_width=True)
             if submit:
                 if not username or not password:
                     st.error("Completa todos los campos")
@@ -100,10 +101,10 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("---")
 
-        st.markdown("**🌍 Curso / Course**")
-        lang_options = {"🇬🇧 English": "en", "🇫🇷 Français": "fr"}
-        current_label = ("🇫🇷 Français" if st.session_state.lang == "fr"
-                          else "🇬🇧 English")
+        st.markdown("**🌍 Curso**")
+        lang_options = {"🇬🇧 Inglés": "en", "🇫🇷 Francés": "fr"}
+        current_label = ("🇫🇷 Francés" if st.session_state.lang == "fr"
+                          else "🇬🇧 Inglés")
         selected = st.radio("", list(lang_options.keys()),
                              index=list(lang_options.keys()).index(current_label),
                              label_visibility="collapsed",
@@ -176,7 +177,7 @@ def page_teacher_dashboard():
     with col3:
         st.metric("📊 Promedio", f"{stats['avg_score']}/10")
     with col4:
-        st.metric("📈 Tasa asistencia", f"{stats['attendance_rate']}%")
+        st.metric("📈 Tasa de asistencia", f"{stats['attendance_rate']}%")
     st.markdown("---")
     sessions = get_all_sessions()
     next_session = next((s for s in sessions if not s["attended"]), None)
@@ -280,7 +281,7 @@ def page_session_live():
     with st.form("session_form"):
         attended = st.checkbox("✅ El alumno asistió",
                                 value=bool(session["attended"]))
-        score = st.slider("📊 Score (0-10)", 0.0, 10.0, 5.0, 0.5)
+        score = st.slider("📊 Puntuación (0-10)", 0.0, 10.0, 5.0, 0.5)
         notes = st.text_area("📝 Observaciones",
                               value=session["notes"] or "", height=150)
         if st.form_submit_button("💾 Guardar", use_container_width=True,
@@ -291,10 +292,7 @@ def page_session_live():
 
 
 def page_sessions():
-    lang = get_lang()
-    title = ("Toutes les Sessions — Français" if lang == "fr"
-             else "Todas las Sesiones")
-    st.markdown(f'<div class="main-header">{title}</div>',
+    st.markdown('<div class="main-header">Todas las Sesiones</div>',
                 unsafe_allow_html=True)
     sessions = get_all_sessions()
     for row in sessions:
@@ -305,7 +303,7 @@ def page_sessions():
             st.markdown(f"**Día:** {row['day']} · "
                         f"**Duración:** {row['duration']}")
             if row["score"] is not None:
-                st.metric("Score", f"{row['score']}/10")
+                st.metric("Puntuación", f"{row['score']}/10")
             if st.button("▶️ Abrir", key=f"open_{row['session_num']}",
                           use_container_width=True):
                 st.session_state.current_session = row["session_num"]
@@ -319,7 +317,7 @@ def page_lessons():
     lang = get_lang()
 
     if lang == "fr":
-        title = "📚 Leçons — Vue Professeur" if is_teacher else "📚 Mes Leçons"
+        title = "📚 Lecciones — Vista Profesor" if is_teacher else "📚 Mis Lecciones"
         lessons = [
             ("L01", "Bonjour !", "A1"), ("L02", "Je suis...", "A1"),
             ("L03", "J'ai...", "A1"), ("L04", "Le / la / les", "A1"),
@@ -334,6 +332,8 @@ def page_lessons():
         ]
         base_path = "fr/"
         student_suffix = "_Cuaderno.pdf"
+        docs_title = "📁 Documentos generales del curso de francés"
+        docs_caption = "Programa, metodología y recursos"
     else:
         title = ("📚 Lecciones — Vista Profesor" if is_teacher
                  else "📚 Mis Lecciones")
@@ -360,36 +360,27 @@ def page_lessons():
         ]
         base_path = ""
         student_suffix = "_Student.pdf"
+        docs_title = "📁 Documentos generales del curso de inglés"
+        docs_caption = "Guías, programa, metodología y recursos complementarios"
 
     st.markdown(f'<div class="main-header">{title}</div>',
                 unsafe_allow_html=True)
 
+    # ============ DOCUMENTS GÉNÉRAUX ============
+    st.markdown(f"### {docs_title}")
+    st.caption(docs_caption)
+
     if lang == "fr":
-        st.markdown("### 📁 Documents généraux du cours de français")
-        st.caption("Programme, méthodologie et ressources")
-        general_docs_fr = [
-            ("fr/syllabus_fr.pdf", "📅 Programme du cours"),
-            ("fr/methodology_guide_fr.pdf", "🎓 Guide pédagogique"),
+        general_docs = [
+            ("fr/syllabus_fr.pdf", "📅 Programa del curso"),
+            ("fr/methodology_guide_fr.pdf", "🎓 Guía pedagógica"),
         ]
         if is_teacher:
-            general_docs_fr.append(
+            general_docs.append(
                 ("fr/progress_tracker_fr.xlsx", "📊 Progress Tracker FR"))
-            general_docs_fr.append(
+            general_docs.append(
                 ("fr/corriges_fr.pdf", "✅ Corrigés des exercices"))
-        cols = st.columns(2)
-        for i, (filename, label) in enumerate(general_docs_fr):
-            with cols[i % 2]:
-                if os.path.exists(filename):
-                    with open(filename, "rb") as f:
-                        st.download_button(f"⬇️ {label}", f,
-                            file_name=filename.split("/")[-1],
-                            key=f"doc_fr_{filename}",
-                            use_container_width=True)
-        st.markdown("---")
-
-    if lang == "en":
-        st.markdown("### 📁 Documentos generales del curso")
-        st.caption("Guías, programa, metodología y recursos complementarios")
+    else:
         general_docs = [
             ("00- Start_here.pdf", "🚀 Guía de inicio"),
             ("01- Syllabus.pdf", "📅 Programa del curso"),
@@ -405,16 +396,17 @@ def page_lessons():
                  "✅ Corrigés ejercicios"))
             general_docs.append(
                 ("Progress_Tracker.xlsx", "📊 Progress Tracker"))
-        cols = st.columns(2)
-        for i, (filename, label) in enumerate(general_docs):
-            with cols[i % 2]:
-                if os.path.exists(filename):
-                    with open(filename, "rb") as f:
-                        st.download_button(f"⬇️ {label}", f,
-                            file_name=filename,
-                            key=f"doc_{filename}",
-                            use_container_width=True)
-        st.markdown("---")
+
+    cols = st.columns(2)
+    for i, (filename, label) in enumerate(general_docs):
+        with cols[i % 2]:
+            if os.path.exists(filename):
+                with open(filename, "rb") as f:
+                    st.download_button(f"⬇️ {label}", f,
+                        file_name=filename.split("/")[-1],
+                        key=f"doc_{lang}_{filename}",
+                        use_container_width=True)
+    st.markdown("---")
 
     st.markdown("### 📚 Lecciones individuales")
 
@@ -517,7 +509,7 @@ def page_pronunciation():
     st.markdown('<div class="sub-header">'
                 'Escucha y practica los sonidos clave</div>',
                 unsafe_allow_html=True)
-    st.info("👉 **Cómo usar:** haz clic en 🔊 para escuchar. "
+    st.info("👉 **Cómo usar:** Haz clic en 🔊 para escuchar. "
             "Repite en voz alta. Vuelve a escuchar. "
             "Usa auriculares para mejor calidad.")
 
@@ -528,16 +520,16 @@ def page_pronunciation():
 
     if lang == "fr":
         lessons_list = [f"L{i:02d}" for i in range(1, 20)]
-        base_label = "Leçon"
+        base_label = "Lección"
         voice_lang = "fr-FR"
     else:
         lessons_list = [f"Class {i:02d}" for i in range(19)]
-        base_label = "Class"
+        base_label = "Lección"
         voice_lang = "en-US"
 
     available = [l for l in lessons_list if l in data]
     if not available:
-        st.warning("Aucune donnée de prononciation disponible.")
+        st.warning("Aún no hay datos de pronunciación disponibles.")
         return
 
     selected = st.selectbox(f"📚 {base_label}", available, index=0,
@@ -546,28 +538,28 @@ def page_pronunciation():
 
     st.markdown("---")
     st.markdown(f"## 🔊 {lesson_data['title']}")
-    st.info(f"💡 **Tip:** {lesson_data['tip']}")
+    st.info(f"💡 **Consejo:** {lesson_data['tip']}")
 
-    st.markdown("### 📝 Mots à pratiquer")
+    st.markdown("### 📝 Palabras para practicar")
     tts_block(lesson_data["words"], lang_code=voice_lang, cols=2)
 
     st.markdown("---")
-    st.markdown("### 💬 Phrases complètes")
+    st.markdown("### 💬 Frases completas")
     tts_block(lesson_data["phrases"], lang_code=voice_lang, cols=1)
 
     st.markdown("---")
-    st.markdown("### 🎯 Ton tour !")
-    st.markdown("**Répète chaque mot 3 fois en voix haute.**")
-    st.markdown("**Puis enregistre-toi dans 'Mis ejercicios' → Audio.**")
+    st.markdown("### 🎯 ¡Tu turno!")
+    st.markdown("**Repite cada palabra 3 veces en voz alta.**")
+    st.markdown("**Luego grábalo en 'Mis ejercicios' → pestaña Audio.**")
 
     if user["role"] == "teacher":
         st.markdown("---")
-        st.markdown("### 👨‍🏫 Notes prof")
-        st.caption("Observer la précision. Corriger max 2 sons par session.")
+        st.markdown("### 👨‍🏫 Notas del profesor")
+        st.caption("Observar la precisión. Corregir máximo 2 sonidos por sesión.")
 
 
 def page_progress():
-    st.markdown('<div class="main-header">📊 Progreso</div>',
+    st.markdown('<div class="main-header">📊 Mi Progreso</div>',
                 unsafe_allow_html=True)
     sessions = get_all_sessions()
     df = pd.DataFrame(sessions)
@@ -575,7 +567,7 @@ def page_progress():
     df["Score_clean"] = pd.to_numeric(df["score"], errors="coerce")
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("### 📈 Evolución de scores")
+        st.markdown("### 📈 Evolución de puntuaciones")
         df_s = df.dropna(subset=["Score_clean"])
         if not df_s.empty:
             fig = px.line(df_s, x="Date", y="Score_clean", markers=True,
@@ -583,7 +575,7 @@ def page_progress():
             fig.update_layout(height=350)
             st.plotly_chart(fig, use_container_width=True)
         else:
-            st.info("Aún no hay scores")
+            st.info("Aún no hay puntuaciones registradas")
     with col2:
         st.markdown("### 📊 Asistencia acumulada")
         df_sorted = df.sort_values("Date").reset_index(drop=True)
@@ -600,7 +592,7 @@ def page_exercises():
     student_id = user["id"]
     lang = get_lang()
 
-    st.markdown('<div class="main-header">✏️ Mis ejercicios</div>',
+    st.markdown('<div class="main-header">✏️ Mis Ejercicios</div>',
                 unsafe_allow_html=True)
     if lang == "fr":
         lessons_opts = [f"L{i:02d}" for i in range(1, 20)]
@@ -631,11 +623,11 @@ def page_exercises():
                     time.sleep(1)
                     st.rerun()
                 else:
-                    st.warning("⚠️ Escribe una respuesta")
+                    st.warning("⚠️ Escribe una respuesta antes de enviar")
 
     with tab_audio:
-        st.markdown("**🎤 Graba tu audio directamente desde aquí**")
-        st.caption("O usa la opción de subir un archivo grabado con tu teléfono")
+        st.markdown("**🎤 Graba tu audio directamente aquí**")
+        st.caption("O sube un archivo grabado con tu teléfono")
         col1, col2 = st.columns(2)
         with col1:
             lesson_audio = st.selectbox("Lección", lessons_opts,
@@ -649,6 +641,7 @@ def page_exercises():
 
         st.markdown("---")
         st.markdown("**📁 Opción 2: Sube un audio grabado**")
+        st.caption("Graba con tu teléfono y súbelo aquí")
         uploaded_file = st.file_uploader("Selecciona tu archivo de audio",
                                            type=["wav", "mp3", "m4a", "ogg"],
                                            key="uploader")
@@ -696,18 +689,22 @@ def page_exercises():
             st.markdown(f"**Enviado:** {sub['submitted_at'][:16]}")
             if sub["answer"].startswith("🎤 Audio:"):
                 link = sub["answer"].replace("🎤 Audio: ", "")
-                st.markdown(f"🎤 **Audio** — [Abrir]({link})")
+                st.markdown(f"🎤 **Audio enviado** — "
+                            f"[Abrir en Google Drive]({link})")
             else:
                 st.markdown(f'<div class="answer-box">{sub["answer"]}</div>',
                             unsafe_allow_html=True)
             if has_fb:
-                st.markdown("**📝 Feedback:**")
+                st.markdown("**📝 Retroalimentación del profesor:**")
                 st.success(sub["feedback"])
+            else:
+                st.caption("⏳ Pendiente de corrección")
 
 
 def page_submissions():
     import time
-    st.markdown('<div class="main-header">📬 Envíos de la estudiante</div>',
+    st.markdown('<div class="main-header">'
+                '📬 Envíos de la estudiante</div>',
                 unsafe_allow_html=True)
     tab1, tab2 = st.tabs(["🟡 En espera", "✅ Corregidas"])
     with tab1:
@@ -721,13 +718,16 @@ def page_submissions():
                     st.markdown(f"**Enviado:** {sub['submitted_at'][:16]}")
                     if sub["answer"].startswith("🎤 Audio:"):
                         link = sub["answer"].replace("🎤 Audio: ", "")
-                        st.markdown(f"🎤 **Audio** — [Abrir en Drive]({link})")
+                        st.markdown(f"🎤 **Audio** — "
+                                    f"[Abrir en Google Drive]({link})")
                     else:
                         st.markdown(
                             f'<div class="answer-box">{sub["answer"]}</div>',
                             unsafe_allow_html=True)
                     fb = st.text_area("✏️ Tu retroalimentación", height=150,
-                                       key=f"fb_{sub['id']}")
+                                       key=f"fb_{sub['id']}",
+                                       placeholder="Excelente uso de... "
+                                                   "Atención a...")
                     if st.button("💾 Enviar", key=f"send_{sub['id']}",
                                   use_container_width=True):
                         if fb.strip():
@@ -735,6 +735,8 @@ def page_submissions():
                             st.success("✅ Guardado")
                             time.sleep(1)
                             st.rerun()
+                        else:
+                            st.warning("⚠️ Escribe una retroalimentación")
     with tab2:
         corrected = get_all_submissions_with_feedback()
         if not corrected:
@@ -749,7 +751,7 @@ def page_submissions():
 
 
 def page_calendar():
-    st.markdown('<div class="main-header">📅 Mi calendario</div>',
+    st.markdown('<div class="main-header">📅 Mi Calendario</div>',
                 unsafe_allow_html=True)
     sessions = get_all_sessions()
     weeks = sorted(set(s["week"] for s in sessions))
@@ -776,7 +778,7 @@ def page_certificate():
         st.metric("Asistencia", f"{stats['attendance_rate']}%")
     st.markdown("---")
     if stats["attended"] >= stats["total"]:
-        st.success("🎉 Curso completado")
+        st.success("🎉 ¡Curso completado!")
         cert = "06-Certificate.pdf"
         if os.path.exists(cert):
             with open(cert, "rb") as f:
@@ -785,12 +787,12 @@ def page_certificate():
                     use_container_width=True)
     else:
         rem = stats["total"] - stats["attended"]
-        st.warning(f"⏳ Faltan {rem} sesiones")
+        st.warning(f"⏳ Faltan {rem} sesiones para completar el curso")
 
 
 def page_change_password():
     import time
-    st.markdown('<div class="main-header">🔐 Cambiar contraseña</div>',
+    st.markdown('<div class="main-header">🔐 Cambiar Contraseña</div>',
                 unsafe_allow_html=True)
     with st.form("change_pwd"):
         new_pwd = st.text_input("Nueva contraseña", type="password")
@@ -804,6 +806,7 @@ def page_change_password():
             else:
                 change_password(st.session_state.user["username"], new_pwd)
                 st.success("✅ Contraseña cambiada")
+                st.info("Cierra sesión y vuelve a entrar con la nueva contraseña.")
                 time.sleep(2)
 
 
@@ -840,20 +843,36 @@ def main():
     else:
         if page == "dashboard":
             st.markdown('<div class="main-header">'
-                        'Bienvenida, Ingrid 🌟</div>',
+                        '¡Bienvenida, Ingrid! 🌟</div>',
                         unsafe_allow_html=True)
             st.markdown('<div class="sub-header">'
-                        'Lingua Bridge Academy · English & Français</div>',
+                        'Lingua Bridge Academy · Inglés y Francés</div>',
                         unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
-                st.metric("Lecciones",
+                st.metric("Lecciones completadas",
                           f"{stats['attended']}/{stats['total']}")
             with col2:
                 st.metric("Promedio", f"{stats['avg_score']}/10")
             with col3:
                 st.metric("Asistencia", f"{stats['attendance_rate']}%")
+
+            st.markdown("---")
+            st.markdown("### 🎯 Siguiente lección")
+            sessions = get_all_sessions()
+            next_s = next((s for s in sessions if not s["attended"]), None)
+            if next_s:
+                st.markdown(f"""
+                <div class="metric-card">
+                    <h3 style='color: #3D1F5C; margin: 0;'>
+                        {next_s['lesson']} — {next_s['content']}
+                    </h3>
+                    <p style='color: #666;'>
+                        📅 {next_s['date']} ({next_s['day']})
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
         elif page == "lessons":
             page_lessons()
         elif page == "pronunciation":
