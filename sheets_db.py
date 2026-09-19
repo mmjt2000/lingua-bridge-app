@@ -209,3 +209,75 @@ def save_feedback(submission_id, feedback):
             sheet.update_cell(i, 7, feedback)
             return True
     return False
+
+# ==================== AUDIO (Google Drive) ====================
+def save_audio_submission(student_id, lesson, exercise_num, audio_bytes, filename):
+    """Sauvegarde un fichier audio dans Google Drive et enregistre le lien."""
+    from googleapiclient.discovery import build
+    from googleapiclient.http import MediaIoBaseUpload
+    import io
+
+    # Créer le client Drive
+    creds_dict = dict(st.secrets["gcp_service_account"])
+    creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
+    drive_service = build('drive', 'v3', credentials=creds)
+
+    # Créer un dossier si besoin
+    folder_name = "Lingua Bridge Audios"
+    response = drive_service.files().list(
+        q=f"name='{folder_name}' and mimeType='application/vnd.google-apps.folder'",
+        spaces='drive',
+        fields='files(id, name)'
+    ).execute()
+
+    if response.get('files'):
+        folder_id = response['files'][0]['id']
+    else:
+        folder_metadata = {
+            'name': folder_name,
+            'mimeType': 'application/vnd.google-apps.folder'
+        }
+        folder = drive_service.files().create(
+            body=folder_metadata, fields='id').execute()
+        folder_id = folder['id']
+
+    # Uploader le fichier audio
+    file_metadata = {
+        'name': filename,
+        'parents': [folder_id]
+    }
+    media = MediaIoBaseUpload(io.BytesIO(audio_bytes),
+                                mimetype='audio/wav', resumable=True)
+    file = drive_service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields='id, webViewLink'
+    ).execute()
+
+    # Rendre le fichier accessible
+    drive_service.permissions().create(
+        fileId=file['id'],
+        body={'role': 'reader', 'type': 'anyone'}
+    ).execute()
+
+    audio_link = file.get('webViewLink', '')
+
+    # Sauvegarder dans Sheets
+    sheet = get_sheet("submissions")
+    records = sheet.get_all_records()
+
+    for i, r in enumerate(records, start=2):
+        if (int(r["student_id"]) == student_id
+                and r["lesson"] == lesson
+                and int(r["exercise_num"]) == exercise_num):
+            sheet.update_cell(i, 5, f"🎤 Audio: {audio_link}")
+            sheet.update_cell(i, 6, datetime.now().strftime("%Y-%m-%d %H:%M"))
+            sheet.update_cell(i, 7, "")
+            return True
+
+    sheet.append_row([
+        len(records) + 1, student_id, lesson, exercise_num,
+        f"🎤 Audio: {audio_link}",
+        datetime.now().strftime("%Y-%m-%d %H:%M"), ""
+    ])
+    return True
