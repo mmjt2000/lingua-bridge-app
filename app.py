@@ -273,6 +273,49 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%);
     }
+    /* ============ SIDEBAR COMPACTE ============ */
+    section[data-testid="stSidebar"] {
+        min-width: 240px !important;
+        max-width: 240px !important;
+    }
+
+    section[data-testid="stSidebar"] > div:first-child {
+        padding: 0.5rem 0.6rem !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton {
+        margin-bottom: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stButton > button {
+        padding: 0.35rem 0.5rem !important;
+        font-size: 0.88rem !important;
+        border-radius: 8px !important;
+        min-height: 34px !important;
+        height: 34px !important;
+        margin-bottom: 0.15rem !important;
+    }
+
+    section[data-testid="stSidebar"] hr {
+        margin: 0.5rem 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio {
+        margin-bottom: 0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio > div {
+        gap: 0.4rem !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio label {
+        font-size: 0.85rem !important;
+    }
+
+    /* Réduire l'espace entre les blocs */
+    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div {
+        gap: 0.15rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -330,41 +373,47 @@ def page_login():
 def render_sidebar():
     user = st.session_state.user
     with st.sidebar:
+        # Logo compact
         st.markdown("""
-        <div style='text-align: center; padding: 1rem 0;'>
-            <h2 style='color: #3D1F5C; margin-bottom: 0;'>Lingua Bridge</h2>
-            <p style='color: #C9A227; font-style: italic; font-size: 0.8rem;
-                      margin-top: 0;'>Building bridges through language</p>
+        <div style='text-align: center; padding: 0.3rem 0;'>
+            <h3 style='color: #3D1F5C; margin: 0; font-size: 1.3rem;'>
+                Lingua Bridge
+            </h3>
+            <p style='color: #C9A227; font-style: italic; font-size: 0.7rem;
+                      margin: 0;'>Building bridges through language</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("---")
 
-        st.markdown("**Curso**")
+        # Sélecteur langue horizontal compact
+        st.markdown("<div style='font-size: 0.85rem; font-weight: 600; "
+                    "margin: 0.5rem 0 0.2rem 0;'>Curso</div>",
+                    unsafe_allow_html=True)
         lang_options = {"Inglés": "en", "Francés": "fr"}
         current_label = ("Francés" if st.session_state.lang == "fr"
                           else "Inglés")
         selected = st.radio("", list(lang_options.keys()),
                              index=list(lang_options.keys()).index(current_label),
                              label_visibility="collapsed",
-                             key="lang_selector")
+                             key="lang_selector",
+                             horizontal=True)
         new_lang = lang_options[selected]
         if new_lang != st.session_state.lang:
             st.session_state.lang = new_lang
             st.session_state.current_session = None
             st.rerun()
 
-        st.markdown("---")
-
+        # User info compact
         role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
         st.markdown(f"""
-        <div style='padding: 0.5rem; background: white; border-radius: 8px;
-                    border-left: 4px solid #FF6B35;'>
-            <b>{user['full_name']}</b><br>
-            <small style='color: #666;'>{role_label}</small>
+        <div style='padding: 0.4rem 0.6rem; background: white;
+                    border-radius: 8px; border-left: 3px solid #FF6B35;
+                    margin: 0.5rem 0;'>
+            <b style='font-size: 0.85rem;'>{user['full_name']}</b><br>
+            <small style='color: #666; font-size: 0.75rem;'>{role_label}</small>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("---")
 
+        # Menu compact
         if user["role"] == "teacher":
             menu_items = [
                 ("Panel", "dashboard"),
@@ -393,14 +442,13 @@ def render_sidebar():
                 st.session_state.page = key
                 st.rerun()
 
-        st.markdown("---")
-        if st.button("Cerrar sesión", use_container_width=True):
+        if st.button("Cerrar sesión", use_container_width=True,
+                      key="logout_btn"):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
-
 
 def page_teacher_dashboard():
     st.markdown('<div class="main-header">Panel del Profesor</div>',
