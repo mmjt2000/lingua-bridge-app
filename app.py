@@ -5,12 +5,20 @@ import plotly.express as px
 from datetime import datetime
 import os
 import streamlit.components.v1 as components
+from sheets_db import get_all_sessions
+from sheets_db import get_session_by_num
+from sheets_db import update_session
+from sheets_db import get_stats
+from sheets_db import authenticate
+from sheets_db import save_submission
+from sheets_db import get_student_submissions
+from sheets_db import get_pending_submissions
+from sheets_db import get_all_submissions_with_feedback
+from sheets_db import save_feedback
+from sheets_db import change_password
+from sheets_db import get_lang
+from sheets_db import save_audio_submission
 
-from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
-
-st.set_page_config(page_title="Langues Bridge Academy", page_icon=":bridge_at_night:", layout="wide", initial_sidebar_state="expanded")
-
-st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
