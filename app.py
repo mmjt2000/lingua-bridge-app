@@ -122,11 +122,11 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
+            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
+            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
-            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
+            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
             if user.get("app_url"):
                 st.markdown("---")
                 st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
