@@ -8,8 +8,7 @@ import os
 import streamlit.components.v1 as components
 
 from pronunciation_data import PRONUNCIATION_DATA
-from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
-
+from sheets_db import get_all_sessions
 st.set_page_config(
     page_title="Lingua Bridge Academy",
     page_icon="🌉",
