@@ -422,16 +422,19 @@ def page_lessons():
                                 key=f"student_{prefix}_{lang}",
                                 use_container_width=True)
             else:
-                st.markdown("**📘 Mi cuaderno de trabajo**")
-                student = f"{base_path}{prefix}{student_suffix}"
-                if os.path.exists(student):
-                    with open(student, "rb") as f:
-                        st.download_button(
-                            f"⬇️ Descargar cuaderno — {class_name}",
-                            f,
-                            file_name=f"{prefix}{student_suffix}",
-                            key=f"student_{prefix}_{lang}",
-                            use_container_width=True)
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.markdown("**Presentacion**")
+                    pptx = f"{base_path}{prefix}_PPT.pptx"
+                    if os.path.exists(pptx):
+                        with open(pptx, "rb") as f:
+                            st.download_button("Descargar PPTX", f, file_name=f"{prefix}_PPT.pptx", key=f"pptx_{prefix}_{lang}", use_container_width=True)
+                with col2:
+                    st.markdown("**Cuaderno de trabajo**")
+                    student = f"{base_path}{prefix}{student_suffix}"
+                    if os.path.exists(student):
+                        with open(student, "rb") as f:
+                            st.download_button("Descargar Cuaderno", f, file_name=f"{prefix}{student_suffix}", key=f"student_{prefix}_{lang}", use_container_width=True)
                 else:
                     st.info("El cuaderno estará disponible pronto")
 
