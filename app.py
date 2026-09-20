@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 import os
+import streamlit.components.v1 as components
 
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
 
@@ -288,18 +289,59 @@ def page_lessons():
                         with open(student, "rb") as f:
                             st.download_button("Descargar Cuaderno", f, file_name=f"{prefix}{student_suffix}", key=f"student_{prefix}_{lang}", use_container_width=True)
 
+def tts_block(items, lang_code="en-US", cols=2):
+    html_items = ""
+    for item in items:
+        safe = item.replace("'", "\\'").replace('"', "&quot;")
+        html_items += f'''
+        <div class="tts-card">
+            <span class="tts-word">{item}</span>
+            <button class="tts-btn" onclick="speak('{safe}')">&#128266;</button>
+        </div>
+        '''
+    html = f"""
+    <html><head><style>
+        * {{ box-sizing: border-box; }}
+        body {{ margin: 0; padding: 0; font-family: Poppins, Arial, sans-serif; }}
+        .grid {{ display: grid; grid-template-columns: repeat({cols}, 1fr); gap: 10px; }}
+        .tts-card {{ display: flex; align-items: center; justify-content: space-between; background: white; border-radius: 12px; padding: 14px 18px; border-left: 5px solid #3D1F5C; box-shadow: 0 4px 16px rgba(61, 31, 92, 0.08); }}
+        .tts-word {{ font-size: 16px; color: #333; font-weight: 500; }}
+        .tts-btn {{ background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%); color: white; border: none; border-radius: 50%; width: 42px; height: 42px; cursor: pointer; font-size: 18px; flex-shrink: 0; transition: all 0.2s; box-shadow: 0 4px 12px rgba(61, 31, 92, 0.25); }}
+        .tts-btn:hover {{ background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%); transform: scale(1.08); }}
+        .tts-btn:active {{ transform: scale(0.95); }}
+    </style></head><body>
+    <div class="grid">{html_items}</div>
+    <script>
+    function speak(text) {{
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = '{lang_code}'; u.rate = 0.8; u.pitch = 1.0; u.volume = 1.0;
+        speechSynthesis.speak(u);
+    }}
+    </script></body></html>
+    """
+    rows = (len(items) + cols - 1) // cols
+    height = rows * 76 + 20
+    components.html(html, height=height)
+
 
 def page_pronunciation():
     lang = get_lang()
     st.markdown('<div class="main-header">Pronunciacion</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Escucha y practica los sonidos clave</div>', unsafe_allow_html=True)
+    st.info("Como usar: Haz clic en el boton para escuchar. Repite en voz alta. Usa auriculares.")
     try:
         from pronunciation_data import PRONUNCIATION_DATA
         data = PRONUNCIATION_DATA.get(lang, {})
         if not data:
             st.warning("Contenido no disponible.")
             return
-        lessons_list = [f"L{i:02d}" for i in range(1, 20)] if lang == "fr" else [f"Class {i:02d}" for i in range(19)]
+        if lang == "fr":
+            lessons_list = [f"L{i:02d}" for i in range(1, 20)]
+            voice_lang = "fr-FR"
+        else:
+            lessons_list = [f"Class {i:02d}" for i in range(19)]
+            voice_lang = "en-US"
         available = [l for l in lessons_list if l in data]
         if not available:
             st.warning("No hay datos disponibles.")
@@ -309,14 +351,16 @@ def page_pronunciation():
         st.markdown(f"## {lesson_data['title']}")
         st.info(f"Consejo: {lesson_data['tip']}")
         st.markdown("### Palabras para practicar")
-        for word in lesson_data["words"]:
-            st.markdown(f"- {word}")
+        tts_block(lesson_data["words"], lang_code=voice_lang, cols=2)
+        st.markdown("---")
         st.markdown("### Frases completas")
-        for phrase in lesson_data["phrases"]:
-            st.markdown(f"- {phrase}")
+        tts_block(lesson_data["phrases"], lang_code=voice_lang, cols=1)
+        st.markdown("---")
+        st.markdown("### Tu turno")
+        st.markdown("**Repite cada palabra 3 veces en voz alta.**")
+        st.markdown("**Luego grabalo en 'Mis ejercicios' - pestana Audio.**")
     except ImportError:
         st.info("Seccion en construccion")
-
 
 def page_progress():
     st.markdown('<div class="main-header">Mi Progreso</div>', unsafe_allow_html=True)
