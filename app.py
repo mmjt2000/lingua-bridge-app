@@ -7,6 +7,9 @@ import os
 import streamlit.components.v1 as components
 
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
+
+st.set_page_config(page_title="Langues Bridge Academy", page_icon=":bridge_at_night:", layout="wide", initial_sidebar_state="expanded")
+
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
@@ -26,9 +29,7 @@ st.markdown("""
     section[data-testid="stSidebar"] hr { margin: 0.3rem 0 !important; }
     section[data-testid="stSidebar"] .stButton > button { padding: 0.2rem 0.4rem !important; font-size: 0.8rem !important; border-radius: 8px !important; min-height: 30px !important; height: 30px !important; margin: 0 0 0.15rem 0 !important; }
     section[data-testid="stSidebar"] .stButton > button p { font-size: 0.8rem !important; margin: 0 !important; }
-    section[data-testid="stSidebar"] .stLinkButton > a { padding: 0.2rem 0.4rem !important; font-size: 0.8rem !important; border-radius: 8px !important; min-height: 30px !important; background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%) !important; color: white !important; font-weight: 600 !important; text-align: center !important; display: block !important; text-decoration: none !important; margin: 0 0 0.15rem 0 !important; }
 </style>
-""", unsafe_allow_html=True)
 """, unsafe_allow_html=True)
 
 if "logged_in" not in st.session_state:
@@ -115,10 +116,6 @@ def render_sidebar():
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
             menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
-            if user.get("app_url"):
-                st.markdown("---")
-                st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
-                st.markdown("---")
         for label, key in menu_items:
             is_active = st.session_state.page == key
             if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
@@ -292,7 +289,6 @@ def page_lessons():
                         with open(student, "rb") as f:
                             st.download_button("Descargar Cuaderno", f, file_name=f"{prefix}{student_suffix}", key=f"student_{prefix}_{lang}", use_container_width=True)
 
-
 def tts_block(items, lang_code="en-US", cols=2):
     html_items = ""
     for item in items:
@@ -365,7 +361,6 @@ def page_pronunciation():
         st.markdown("**Luego grabalo en 'Mis ejercicios' - pestana Audio.**")
     except ImportError:
         st.info("Seccion en construccion")
-
 
 def page_progress():
     st.markdown('<div class="main-header">Mi Progreso</div>', unsafe_allow_html=True)
