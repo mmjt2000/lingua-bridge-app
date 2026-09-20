@@ -120,7 +120,7 @@ def render_sidebar():
             	st.markdown("---")
             	st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
             	st.caption("Credenciales para tu aplicacion:")
-            	st.code("Usuario: " + user.get("email", "") + "\nContrasena: " + user.get("password", ""), language=None)
+            	st.code("Usuario: " + user.get("app_email", "") + "\nContrasena: " + user.get("app_password", ""), language=None)
             	st.markdown("---")
         for label, key in menu_items:
             is_active = st.session_state.page == key
