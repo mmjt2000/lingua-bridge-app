@@ -127,10 +127,7 @@ def render_sidebar():
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music") ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
                     menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
-            if user.get("app_url"):
-                st.markdown("---")
-                st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
-                st.markdown("---")
+            
         for label, key in menu_items:
             is_active = st.session_state.page == key
             if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
