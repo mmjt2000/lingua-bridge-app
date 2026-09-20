@@ -51,7 +51,15 @@ def authenticate(username, password):
                 "full_name": r["full_name"],
                 "email": r.get("email", "")
             }
-    return None
+                return {
+                "id": int(r["id"]),
+                "username": r["username"],
+                "password": r["password"],
+                "role": r["role"],
+                "full_name": r["full_name"],
+                "email": r.get("email", ""),
+                "app_url": r.get("app_url", "")
+            }
 
 
 def change_password(username, new_password):
