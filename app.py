@@ -7,6 +7,7 @@ import os
 import streamlit.components.v1 as components
 
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
+st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
@@ -27,6 +28,7 @@ from sheets_db import get_all_sessions, get_session_by_num, update_session, get_
     section[data-testid="stSidebar"] .stButton > button p { font-size: 0.8rem !important; margin: 0 !important; }
     section[data-testid="stSidebar"] .stLinkButton > a { padding: 0.2rem 0.4rem !important; font-size: 0.8rem !important; border-radius: 8px !important; min-height: 30px !important; background: linear-gradient(135deg, #3D1F5C 0%, #5A2F8A 100%) !important; color: white !important; font-weight: 600 !important; text-align: center !important; display: block !important; text-decoration: none !important; margin: 0 0 0.15rem 0 !important; }
 </style>
+""", unsafe_allow_html=True)
 """, unsafe_allow_html=True)
 
 if "logged_in" not in st.session_state:
