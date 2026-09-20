@@ -50,7 +50,9 @@ def authenticate(username, password):
                         "role": r["role"],
                         "full_name": r["full_name"],
                         "email": r.get("email", ""),
-                        "app_url": r.get("app_url", "")
+                        "app_url": r.get("app_url", ""),
+                        "app_email": r.get("app_email", ""),
+                        "app_password": r.get("app_password", "")
             }
     return None
 
