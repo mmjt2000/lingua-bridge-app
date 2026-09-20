@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Langues Bridge ACADEMY — App multi-langue (EN / FR)"""
+"""LINGUA BRIDGE ACADEMY — App multi-langue (EN / FR)"""
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -8,10 +8,15 @@ import os
 import streamlit.components.v1 as components
 
 from pronunciation_data import PRONUNCIATION_DATA
-from sheets_db import *
+from sheets_db import (
+    get_all_sessions, get_session_by_num, update_session, get_stats,
+    authenticate, save_submission, get_student_submissions,
+    get_pending_submissions, get_all_submissions_with_feedback,
+    save_feedback, change_password, get_lang, save_audio_submission
+)
 
 st.set_page_config(
-    page_title="Langues Bridge Academy",
+    page_title="Lingua Bridge Academy",
     page_icon="🌉",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -30,12 +35,6 @@ st.markdown("""
         text-align: center;}
     .answer-box {background: #F0F8F0; padding: 1rem; border-radius: 8px;
         border-left: 4px solid #2E7D32;}
-    section[data-testid="stSidebar"] { min-width: 230px !important; max-width: 230px !important; }
-    section[data-testid="stSidebar"] > div:first-child { padding: 0.3rem 0.5rem !important; }
-    section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] { gap: 0 !important; }
-    section[data-testid="stSidebar"] [data-testid="element-container"] { margin: 0 !important; }
-    section[data-testid="stSidebar"] .stButton > button { padding: 0.2rem 0.4rem !important; font-size: 0.8rem !important; border-radius: 8px !important; min-height: 30px !important; height: 30px !important; margin: 0 0 0.15rem 0 !important; }
-    section[data-testid="stSidebar"] .stButton > button p { font-size: 0.8rem !important; margin: 0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -60,7 +59,7 @@ def page_login():
         st.markdown("""
         <div style='text-align: center;'>
             <h1 style='color: #3D1F5C; font-size: 3rem; margin-bottom: 0;'>
-                🌉 Langues Bridge Academy
+                🌉 Lingua Bridge Academy
             </h1>
             <p style='color: #C9A227; font-style: italic; margin-top: 0;'>
                 Building bridges through language
@@ -94,52 +93,77 @@ def render_sidebar():
     user = st.session_state.user
     with st.sidebar:
         st.markdown("""
-        <div style='text-align: center; padding: 0.8rem 0 0.5rem 0;'>
-            <div style='font-size: 1.3rem; font-weight: 700; color: #3D1F5C; line-height: 1.2;'>Langues Bridge</div>
-            <div style='font-size: 0.7rem; color: #C9A227; font-style: italic; margin-top: 2px;'>Building bridges through language</div>
+        <div style='text-align: center; padding: 1rem 0;'>
+            <h2 style='color: #3D1F5C; margin-bottom: 0;'>🌉 Lingua Bridge</h2>
+            <p style='color: #C9A227; font-style: italic; font-size: 0.8rem;
+                      margin-top: 0;'>Building bridges through language</p>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("**Curso**")
-        lang_options = {"Ingles": "en", "Frances": "fr"}
-        current_label = "Frances" if st.session_state.lang == "fr" else "Ingles"
-        selected = st.radio("", list(lang_options.keys()), index=list(lang_options.keys()).index(current_label), label_visibility="collapsed", key="lang_selector")
+        st.markdown("---")
+
+        st.markdown("**🌍 Curso**")
+        lang_options = {"🇬🇧 Inglés": "en", "🇫🇷 Francés": "fr"}
+        current_label = ("🇫🇷 Francés" if st.session_state.lang == "fr"
+                          else "🇬🇧 Inglés")
+        selected = st.radio("", list(lang_options.keys()),
+                             index=list(lang_options.keys()).index(current_label),
+                             label_visibility="collapsed",
+                             key="lang_selector")
         new_lang = lang_options[selected]
         if new_lang != st.session_state.lang:
             st.session_state.lang = new_lang
             st.session_state.current_session = None
             st.rerun()
-        st.markdown("<div style='height: 0.6rem;'></div>", unsafe_allow_html=True)
-        role_label = "PROFESOR" if user["role"] == "teacher" else "ESTUDIANTE"
-        initials = "".join([n[0] for n in user['full_name'].split()[:2]]).upper()
+
+        st.markdown("---")
+
+        role_emoji = "👨‍🏫" if user["role"] == "teacher" else "👩‍🎓"
+        role_label = "Profesor" if user["role"] == "teacher" else "Estudiante"
         st.markdown(f"""
-        <div style='background: linear-gradient(135deg, #FF6B35 0%, #FF8A5B 100%); border-radius: 12px; padding: 12px 10px; margin-bottom: 4px; display: flex; align-items: center; gap: 10px;'>
-            <div style='width: 40px; height: 40px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #FF6B35; font-size: 0.85rem; flex-shrink: 0;'>{initials}</div>
-            <div style='flex: 1; min-width: 0;'>
-                <div style='color: white; font-size: 0.82rem; font-weight: 600; line-height: 1.15;'>{user['full_name']}</div>
-                <div style='color: white; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px;'>{role_label}</div>
-            </div>
+        <div style='padding: 0.5rem; background: white; border-radius: 8px;
+                    border-left: 4px solid #FF6B35;'>
+            <b>{role_emoji} {user['full_name']}</b><br>
+            <small style='color: #666;'>{role_label}</small>
         </div>
         """, unsafe_allow_html=True)
-        st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
+        st.markdown("---")
+
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
-        elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music") ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
+            menu_items = [
+                ("🏠 Panel", "dashboard"),
+                ("📬 Envíos", "submissions"),
+                ("📅 Sesiones", "sessions"),
+                ("📚 Lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
+                ("📊 Progreso", "progress"),
+                ("🎓 Certificado", "certificate"),
+                ("🔐 Cambiar contraseña", "change_password"),
+            ]
         else:
-                    menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
-            
+            menu_items = [
+                ("🏠 Inicio", "dashboard"),
+                ("📚 Mis lecciones", "lessons"),
+                ("🎤 Pronunciación", "pronunciation"),
+                ("✏️ Mis ejercicios", "exercises"),
+                ("📊 Mi progreso", "progress"),
+                ("📅 Mi calendario", "calendar"),
+            ]
+
         for label, key in menu_items:
             is_active = st.session_state.page == key
-            if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
+            if st.button(label, key=f"nav_{key}", use_container_width=True,
+                          type="primary" if is_active else "secondary"):
                 st.session_state.page = key
                 st.rerun()
-        st.markdown("<div style='height: 1rem;'></div>", unsafe_allow_html=True)
-        if st.button("Cerrar sesion", use_container_width=True, key="logout_btn"):
+
+        st.markdown("---")
+        if st.button("🚪 Cerrar sesión", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.user = None
             st.session_state.page = "dashboard"
             st.session_state.lang = "en"
             st.rerun()
+
 
 def page_teacher_dashboard():
     st.markdown('<div class="main-header">Panel del Profesor</div>',
@@ -419,19 +443,18 @@ def page_lessons():
                                 key=f"student_{prefix}_{lang}",
                                 use_container_width=True)
             else:
-                col1, col2 = st.columns(2)
-                with col1:
-                    st.markdown("**Presentacion**")
-                    pptx = f"{base_path}{prefix}_PPT.pptx"
-                    if os.path.exists(pptx):
-                        with open(pptx, "rb") as f:
-                            st.download_button("Descargar PPTX", f, file_name=f"{prefix}_PPT.pptx", key=f"pptx_{prefix}_{lang}", use_container_width=True)
-                with col2:
-                    st.markdown("**Cuaderno de trabajo**")
-                    student = f"{base_path}{prefix}{student_suffix}"
-                    if os.path.exists(student):
-                        with open(student, "rb") as f:
-                            st.download_button("Descargar Cuaderno", f, file_name=f"{prefix}{student_suffix}", key=f"student_{prefix}_{lang}", use_container_width=True)
+                st.markdown("**📘 Mi cuaderno de trabajo**")
+                student = f"{base_path}{prefix}{student_suffix}"
+                if os.path.exists(student):
+                    with open(student, "rb") as f:
+                        st.download_button(
+                            f"⬇️ Descargar cuaderno — {class_name}",
+                            f,
+                            file_name=f"{prefix}{student_suffix}",
+                            key=f"student_{prefix}_{lang}",
+                            use_container_width=True)
+                else:
+                    st.info("El cuaderno estará disponible pronto")
 
 
 def tts_block(items, lang_code="en-US", cols=2):
@@ -479,54 +502,6 @@ def tts_block(items, lang_code="en-US", cols=2):
 
 
 def page_pronunciation():
-    def page_music():
-    lang = get_lang()
-    st.markdown('<div class="main-header">Canciones / Chansons</div>', unsafe_allow_html=True)
-    st.markdown('<div class="sub-header">Aprende con musica</div>', unsafe_allow_html=True)
-    try:
-        from songs_data import SONGS
-        songs = SONGS.get(lang, {})
-        if not songs:
-            st.warning("Contenido no disponible.")
-            return
-        if lang == "fr":
-            lessons_list = [f"L{i:02d}" for i in range(1, 20)]
-        else:
-            lessons_list = [f"Class {i:02d}" for i in range(19)]
-        available = [l for l in lessons_list if l in songs]
-        if not available:
-            st.warning("No hay canciones disponibles.")
-            return
-        selected = st.selectbox("Leccion", available, index=0)
-        song = songs[selected]
-        st.markdown(f"## {song['title']}")
-        st.markdown(f"**{song['artist']}** · Nivel {song['level']}")
-        st.markdown("---")
-        st.markdown("### Escucha la cancion")
-        yt_url = f"https://www.youtube.com/embed/{song['yt']}"
-        st.markdown(f'<iframe width="100%" height="315" src="{yt_url}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown("### Vocabulario clave")
-        for v in song["vocab"]:
-            st.markdown(f"- {v}")
-        st.markdown("---")
-        st.markdown("### Completa las letras")
-        for i, f in enumerate(song["fill"]):
-            st.markdown(f"**{i+1}.** {f['line']}")
-            user_ans = st.text_input(f"Tu respuesta {i+1}", key=f"fill_{lang}_{selected}_{i}")
-            if user_ans:
-                if user_ans.strip().lower() == f["ans"].lower():
-                    st.success(f"Correcto: {f['ans']}")
-                else:
-                    st.error(f"Incorrecto. La respuesta es: {f['ans']}")
-        st.markdown("---")
-        st.markdown("### Preguntas de comprension")
-        for i, q in enumerate(song["quiz"]):
-            st.markdown(f"**{i+1}.** {q['q']}")
-            with st.expander("Ver respuesta"):
-                st.write(f"**{q['a']}**")
-    except ImportError:
-        st.info("Seccion en construccion")
     user = st.session_state.user
     lang = get_lang()
     st.markdown('<div class="main-header">🎤 Pronunciación</div>',
@@ -859,8 +834,6 @@ def main():
             page_pronunciation()
         elif page == "progress":
             page_progress()
-        elif page == "music":
-            page_music()
         elif page == "certificate":
             page_certificate()
         elif page == "change_password":
@@ -873,7 +846,7 @@ def main():
                         '¡Bienvenida, Ingrid! 🌟</div>',
                         unsafe_allow_html=True)
             st.markdown('<div class="sub-header">'
-                        'Langues Bridge Academy · Inglés y Francés</div>',
+                        'Lingua Bridge Academy · Inglés y Francés</div>',
                         unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
@@ -908,8 +881,6 @@ def main():
             page_exercises()
         elif page == "progress":
             page_progress()
-        elif page == "music":
-            page_music()
         elif page == "calendar":
             page_calendar()
         else:
