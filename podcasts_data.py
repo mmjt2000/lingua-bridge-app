@@ -1,0 +1,45 @@
+# -*- coding: utf-8 -*-
+PODCASTS = {
+    "en": {
+        "Class 00": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")],
+        "Class 01": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")],
+        "Class 02": [("6 Minute Grammar - Past Simple - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-grammar")],
+        "Class 03": [("The English We Speak - BBC", "https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak")],
+        "Class 04": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")],
+        "Class 05": [("Coffee Break English", "https://coffeebreaklanguages.com/coffeebreakenglish/")],
+        "Class 06": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")],
+        "Class 07": [("All Ears English", "https://www.allearsenglish.com/episodes/")],
+        "Class 08": [("Luke's English Podcast", "https://teacherluke.co.uk/")],
+        "Class 09": [("6 Minute Grammar - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-grammar")],
+        "Class 10": [("Culips ESL Podcast", "https://culips.com/")],
+        "Class 11": [("The English We Speak - BBC", "https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak")],
+        "Class 12": [("6 Minute Grammar - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-grammar")],
+        "Class 13": [("6 Minute Grammar - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-grammar")],
+        "Class 14": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")],
+        "Class 15": [("All Ears English", "https://www.allearsenglish.com/episodes/")],
+        "Class 16": [("The English We Speak - BBC", "https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak")],
+        "Class 17": [("6 Minute Grammar - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-grammar")],
+        "Class 18": [("6 Minute English - BBC", "https://www.bbc.co.uk/learningenglish/english/features/6-minute-english")]
+    },
+    "fr": {
+        "L01": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L02": [("Francais Authentique", "https://www.francaisauthentique.com/")],
+        "L03": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L04": [("Journal en francais facile - RFI", "https://www.rfi.fr/fr/podcasts/journal-en-francais-facile/")],
+        "L05": [("InnerFrench", "https://innerfrench.com/podcast/")],
+        "L06": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L07": [("Francais Authentique", "https://www.francaisauthentique.com/")],
+        "L08": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L09": [("InnerFrench", "https://innerfrench.com/podcast/")],
+        "L10": [("Journal en francais facile - RFI", "https://www.rfi.fr/fr/podcasts/journal-en-francais-facile/")],
+        "L11": [("Francais Authentique", "https://www.francaisauthentique.com/")],
+        "L12": [("InnerFrench", "https://innerfrench.com/podcast/")],
+        "L13": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L14": [("Francais Authentique", "https://www.francaisauthentique.com/")],
+        "L15": [("InnerFrench", "https://innerfrench.com/podcast/")],
+        "L16": [("Journal en francais facile - RFI", "https://www.rfi.fr/fr/podcasts/journal-en-francais-facile/")],
+        "L17": [("Coffee Break French", "https://coffeebreaklanguages.com/coffeebreakfrench/")],
+        "L18": [("InnerFrench", "https://innerfrench.com/podcast/")],
+        "L19": [("Francais Authentique", "https://www.francaisauthentique.com/")]
+    }
+}

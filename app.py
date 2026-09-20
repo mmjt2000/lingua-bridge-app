@@ -340,6 +340,15 @@ def page_music():
             st.markdown(f"**{i+1}.** {q['q']}")
             with st.expander("Ver respuesta"):
                 st.write("**" + q['a'] + "**")
+        st.markdown("---")
+        st.markdown("### Podcasts recomendados")
+        try:
+            from podcasts_data import PODCASTS
+            podcasts_list = PODCASTS.get(lang, {}).get(selected, [])
+            for name, url in podcasts_list:
+                st.markdown(f"- [{name}]({url})")
+        except ImportError:
+            pass
     except ImportError:
         st.info("Seccion en construccion")
 
