@@ -122,11 +122,11 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
+            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
+            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music") ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
-            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
+                    menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
             if user.get("app_url"):
                 st.markdown("---")
                 st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
@@ -481,7 +481,8 @@ def tts_block(items, lang_code="en-US", cols=2):
     components.html(html, height=height)
 
 
-def page_music():
+def page_pronunciation():
+    def page_music():
     lang = get_lang()
     st.markdown('<div class="main-header">Canciones / Chansons</div>', unsafe_allow_html=True)
     st.markdown('<div class="sub-header">Aprende con musica</div>', unsafe_allow_html=True)
@@ -505,8 +506,8 @@ def page_music():
         st.markdown(f"**{song['artist']}** · Nivel {song['level']}")
         st.markdown("---")
         st.markdown("### Escucha la cancion")
-        yt_url = "https://www.youtube.com/embed/" + song["yt"]
-        st.markdown('<iframe width="100%" height="315" src="' + yt_url + '" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
+        yt_url = f"https://www.youtube.com/embed/{song['yt']}"
+        st.markdown(f'<iframe width="100%" height="315" src="{yt_url}" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
         st.markdown("---")
         st.markdown("### Vocabulario clave")
         for v in song["vocab"]:
@@ -515,23 +516,20 @@ def page_music():
         st.markdown("### Completa las letras")
         for i, f in enumerate(song["fill"]):
             st.markdown(f"**{i+1}.** {f['line']}")
-            user_ans = st.text_input(f"Tu respuesta {i+1}", key="fill_" + lang + "_" + selected + "_" + str(i))
+            user_ans = st.text_input(f"Tu respuesta {i+1}", key=f"fill_{lang}_{selected}_{i}")
             if user_ans:
                 if user_ans.strip().lower() == f["ans"].lower():
-                    st.success("Correcto: " + f["ans"])
+                    st.success(f"Correcto: {f['ans']}")
                 else:
-                    st.error("Incorrecto. La respuesta es: " + f["ans"])
+                    st.error(f"Incorrecto. La respuesta es: {f['ans']}")
         st.markdown("---")
         st.markdown("### Preguntas de comprension")
         for i, q in enumerate(song["quiz"]):
             st.markdown(f"**{i+1}.** {q['q']}")
             with st.expander("Ver respuesta"):
-                st.write("**" + q['a'] + "**")
+                st.write(f"**{q['a']}**")
     except ImportError:
         st.info("Seccion en construccion")
-
-
-def page_pronunciation():
     user = st.session_state.user
     lang = get_lang()
     st.markdown('<div class="main-header">🎤 Pronunciación</div>',
@@ -866,7 +864,7 @@ def main():
             page_progress()
         elif page == "music":
             page_music()
-	elif page == "certificate":
+        elif page == "certificate":
             page_certificate()
         elif page == "change_password":
             page_change_password()
@@ -915,15 +913,11 @@ def main():
             page_progress()
         elif page == "music":
             page_music()
-	elif page == "calendar":
+        elif page == "calendar":
             page_calendar()
         else:
-            if page == "music":
-                page_music()
-            elif page == "pronunciation":
-                page_pronunciation()
-            else:
-                page_lessons()
+            page_lessons()
+
 
 if __name__ == "__main__":
     main()
