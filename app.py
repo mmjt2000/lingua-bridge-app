@@ -435,8 +435,6 @@ def page_lessons():
                     if os.path.exists(student):
                         with open(student, "rb") as f:
                             st.download_button("Descargar Cuaderno", f, file_name=f"{prefix}{student_suffix}", key=f"student_{prefix}_{lang}", use_container_width=True)
-                else:
-                    st.info("El cuaderno estará disponible pronto")
 
 
 def tts_block(items, lang_code="en-US", cols=2):
