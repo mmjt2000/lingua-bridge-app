@@ -116,7 +116,7 @@ def render_sidebar():
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
             menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation")]
-                if user["role"] == "guest" and user.get("app_url"):
+        if user["role"] == "guest" and user.get("app_url"):
             st.markdown("---")
             st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
             st.markdown("---")
