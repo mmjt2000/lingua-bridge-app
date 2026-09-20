@@ -19,6 +19,7 @@ from sheets_db import change_password
 from sheets_db import get_lang
 from sheets_db import save_audio_submission
 
+st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
     html, body, [class*="css"] { font-family: 'Poppins', sans-serif; }
