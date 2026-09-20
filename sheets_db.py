@@ -42,16 +42,8 @@ def get_sheet(name):
 def authenticate(username, password):
     sheet = get_sheet("users")
     for r in sheet.get_all_records():
-        if str(r["username"]) == username and str(r["password"]) == password:
+                if str(r["username"]) == username and str(r["password"]) == password:
             return {
-                "id": int(r["id"]),
-                "username": r["username"],
-                "password": r["password"],
-                "role": r["role"],
-                "full_name": r["full_name"],
-                "email": r.get("email", "")
-            }
-                return {
                 "id": int(r["id"]),
                 "username": r["username"],
                 "password": r["password"],
@@ -60,6 +52,7 @@ def authenticate(username, password):
                 "email": r.get("email", ""),
                 "app_url": r.get("app_url", "")
             }
+    return None
 
 
 def change_password(username, new_password):
