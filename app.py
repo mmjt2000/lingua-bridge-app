@@ -8,7 +8,7 @@ import streamlit.components.v1 as components
 
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
 
-st.set_page_config(page_title="Lingua Bridge Academy", page_icon=":bridge_at_night:", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Langues Bridge Academy", page_icon=":bridge_at_night:", layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
@@ -51,7 +51,7 @@ def page_login():
         st.markdown("""
         <div style='text-align: center;'>
             <h1 style='color: #3D1F5C; font-size: 3rem; margin-bottom: 0;'>
-                Lingua Bridge Academy
+                Langues Bridge Academy
             </h1>
             <p style='color: #C9A227; font-style: italic; margin-top: 0;'>
                 Building bridges through language
@@ -84,7 +84,7 @@ def render_sidebar():
     with st.sidebar:
         st.markdown("""
         <div style='text-align: center; padding: 0.8rem 0 0.5rem 0;'>
-            <div style='font-size: 1.3rem; font-weight: 700; color: #3D1F5C; line-height: 1.2;'>Lingua Bridge</div>
+            <div style='font-size: 1.3rem; font-weight: 700; color: #3D1F5C; line-height: 1.2;'>Langues Bridge</div>
             <div style='font-size: 0.7rem; color: #C9A227; font-style: italic; margin-top: 2px;'>Building bridges through language</div>
         </div>
         """, unsafe_allow_html=True)
@@ -555,7 +555,7 @@ def main():
     elif user["role"] == "student":
         if page == "dashboard":
             st.markdown('<div class="main-header">Bienvenida, Ingrid</div>', unsafe_allow_html=True)
-            st.markdown('<div class="sub-header">Lingua Bridge Academy - Ingles y Frances</div>', unsafe_allow_html=True)
+            st.markdown('<div class="sub-header">Langues Bridge Academy - Ingles y Frances</div>', unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
             with col1:
