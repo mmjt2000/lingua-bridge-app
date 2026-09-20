@@ -481,6 +481,56 @@ def tts_block(items, lang_code="en-US", cols=2):
     components.html(html, height=height)
 
 
+def page_music():
+    lang = get_lang()
+    st.markdown('<div class="main-header">Canciones / Chansons</div>', unsafe_allow_html=True)
+    st.markdown('<div class="sub-header">Aprende con musica</div>', unsafe_allow_html=True)
+    try:
+        from songs_data import SONGS
+        songs = SONGS.get(lang, {})
+        if not songs:
+            st.warning("Contenido no disponible.")
+            return
+        if lang == "fr":
+            lessons_list = [f"L{i:02d}" for i in range(1, 20)]
+        else:
+            lessons_list = [f"Class {i:02d}" for i in range(19)]
+        available = [l for l in lessons_list if l in songs]
+        if not available:
+            st.warning("No hay canciones disponibles.")
+            return
+        selected = st.selectbox("Leccion", available, index=0)
+        song = songs[selected]
+        st.markdown(f"## {song['title']}")
+        st.markdown(f"**{song['artist']}** · Nivel {song['level']}")
+        st.markdown("---")
+        st.markdown("### Escucha la cancion")
+        yt_url = "https://www.youtube.com/embed/" + song["yt"]
+        st.markdown('<iframe width="100%" height="315" src="' + yt_url + '" frameborder="0" allowfullscreen></iframe>', unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown("### Vocabulario clave")
+        for v in song["vocab"]:
+            st.markdown(f"- {v}")
+        st.markdown("---")
+        st.markdown("### Completa las letras")
+        for i, f in enumerate(song["fill"]):
+            st.markdown(f"**{i+1}.** {f['line']}")
+            user_ans = st.text_input(f"Tu respuesta {i+1}", key="fill_" + lang + "_" + selected + "_" + str(i))
+            if user_ans:
+                if user_ans.strip().lower() == f["ans"].lower():
+                    st.success("Correcto: " + f["ans"])
+                else:
+                    st.error("Incorrecto. La respuesta es: " + f["ans"])
+        st.markdown("---")
+        st.markdown("### Preguntas de comprension")
+        for i, q in enumerate(song["quiz"]):
+            st.markdown(f"**{i+1}.** {q['q']}")
+            with st.expander("Ver respuesta"):
+                st.write("**" + q['a'] + "**")
+    except ImportError:
+        st.info("Seccion en construccion")
+
+
 def page_pronunciation():
     user = st.session_state.user
     lang = get_lang()
@@ -814,7 +864,9 @@ def main():
             page_pronunciation()
         elif page == "progress":
             page_progress()
-        elif page == "certificate":
+        elif page == "music":
+            page_music()
+	elif page == "certificate":
             page_certificate()
         elif page == "change_password":
             page_change_password()
@@ -861,11 +913,17 @@ def main():
             page_exercises()
         elif page == "progress":
             page_progress()
-        elif page == "calendar":
+        elif page == "music":
+            page_music()
+	elif page == "calendar":
             page_calendar()
         else:
-            page_lessons()
-
+            if page == "music":
+                page_music()
+            elif page == "pronunciation":
+                page_pronunciation()
+            else:
+                page_lessons()
 
 if __name__ == "__main__":
     main()
