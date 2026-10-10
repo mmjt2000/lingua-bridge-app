@@ -5,6 +5,7 @@ import plotly.express as px
 from datetime import datetime
 import os
 import streamlit.components.v1 as components
+from voice_module import render_voice_module
 
 from sheets_db import get_all_sessions, get_session_by_num, update_session, get_stats, authenticate, save_submission, get_student_submissions, get_pending_submissions, get_all_submissions_with_feedback, save_feedback, change_password, get_lang, save_audio_submission
 
@@ -111,7 +112,7 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
+            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         elif user["role"] == "student":
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
@@ -611,6 +612,9 @@ def main():
             page_lessons()
         elif page == "pronunciation":
             page_pronunciation()
+        elif page == "voice_ai":
+            from voice_module import render_voice_module
+            render_voice_module()
         elif page == "music":
             page_music()
         elif page == "progress":
