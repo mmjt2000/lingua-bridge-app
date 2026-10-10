@@ -19,18 +19,25 @@ from groq import Groq
 # CONFIG
 # ============================================================
 def _get_groq_key():
-    """
-    Lit la cle Groq depuis :
-    1. Variable d'environnement (recommande sur Streamlit Cloud)
-    2. st.secrets (fallback)
-    """
-    key = os.environ.get("GROQ_API_KEY", "")
+    """Lit la cle Groq depuis 3 parties OU env OU secrets."""
+    # 1. Variable d'environnement (local)
+    key = os.environ.get("GROQ_API_KEY", "").strip()
     if key:
-        return key.strip()
+        return key
+    # 2. Secrets Streamlit - 3 parties
     try:
-        key = st.secrets.get("GROQ_API_KEY", "")
+        p1 = st.secrets.get("GROQ_KEY_1", "")
+        p2 = st.secrets.get("GROQ_KEY_2", "")
+        p3 = st.secrets.get("GROQ_KEY_3", "")
+        if p1 and p2 and p3:
+            return (p1 + p2 + p3).strip()
+    except Exception:
+        pass
+    # 3. Secrets Streamlit - cle complete
+    try:
+        key = st.secrets.get("GROQ_API_KEY", "").strip()
         if key:
-            return key.strip()
+            return key
     except Exception:
         pass
     return ""
