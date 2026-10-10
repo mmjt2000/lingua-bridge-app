@@ -231,11 +231,17 @@ def render_voice_module():
     if not GROQ_API_KEY:
         st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
         # DEBUG temporaire
-        try:
-            st.write("**Debug secrets** — clés disponibles :", list(st.secrets.keys()))
-            st.write("GROQ_KEY_1 présent :", "GROQ_KEY_1" in st.secrets)
-            st.write("GROQ_KEY_2 présent :", "GROQ_KEY_2" in st.secrets)
-            st.write("GROQ_KEY_3 présent :", "GROQ_KEY_3" in st.secrets)
+                try:
+            st.write("**Debug 1** — clés:", list(st.secrets.keys()))
+            st.write("**Debug 2** — type secrets:", type(st.secrets).__name__)
+            # Test d'accès direct
+            try:
+                v1 = st.secrets["GROQ_KEY_1"]
+                st.write("**Debug 3** — GROQ_KEY_1 valeur brute:", repr(v1))
+            except KeyError:
+                st.write("**Debug 3** — GROQ_KEY_1 : KeyError")
+            except Exception as e2:
+                st.write("**Debug 3** — erreur:", str(e2))
         except Exception as e:
             st.write("Erreur lecture secrets :", str(e))
         return
