@@ -1,0 +1,22 @@
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+
+# Base de données locale
+*.db
+
+# Dossier lessons (sera régénéré)
+lessons.json
+
+# Divers
+.DS_Store
+*.log

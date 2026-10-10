@@ -111,7 +111,7 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
         if user["role"] == "teacher":
-            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
+                        menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         elif user["role"] == "student":
             menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
@@ -611,6 +611,11 @@ def main():
             page_lessons()
         elif page == "pronunciation":
             page_pronunciation()
+        elif page == "voice_ai":
+            from voice_module import render_voice_module
+            render_voice_module()
+        elif page == "music":
+            page_music()
         elif page == "music":
             page_music()
         elif page == "progress":
