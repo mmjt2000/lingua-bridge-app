@@ -172,7 +172,7 @@ Start by asking your first question or saying your first line. Keep it SHORT.
 # ============================================================
 # TTS
 # ============================================================
-def text_to_speech(text, voice=VOICE_TTS, lang="en"):
+def text_to_speech(text, voice="en-US-AriaNeural", lang="en"):
     import edge_tts
     import re
 
