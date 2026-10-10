@@ -228,8 +228,16 @@ def render_voice_module():
     st.markdown("## 🎤 Práctica con IA")
     st.markdown("*Habla en inglés, la IA te escucha, corrige y responde con voz.*")
 
-    if not GROQ_API_KEY:
-        st.error("⚠️ GROQ_API_KEY n'est pas configurée. Ajoutez-la dans les variables d'environnement.")
+       if not GROQ_API_KEY:
+        st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
+        # DEBUG temporaire
+        try:
+            st.write("**Debug secrets** — clés disponibles :", list(st.secrets.keys()))
+            st.write("GROQ_KEY_1 présent :", "GROQ_KEY_1" in st.secrets)
+            st.write("GROQ_KEY_2 présent :", "GROQ_KEY_2" in st.secrets)
+            st.write("GROQ_KEY_3 présent :", "GROQ_KEY_3" in st.secrets)
+        except Exception as e:
+            st.write("Erreur lecture secrets :", str(e))
         return
 
     mode = st.radio(
