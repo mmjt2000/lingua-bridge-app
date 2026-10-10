@@ -3,7 +3,7 @@ Lingua Bridge — Module IA Vocal
 Conversation libre + Mode cours guide
 STT: Groq Whisper
 LLM: Groq Llama 3
-TTS: edge-tts (audio)
+TTS: edge-tts
 """
 import os
 import io
@@ -19,13 +19,29 @@ from groq import Groq
 # ============================================================
 # CONFIG
 # ============================================================
-from dotenv import load_dotenv
-load_dotenv()
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+def _get_groq_key():
+    """Recupere la cle Groq depuis secrets Streamlit ou env."""
+    # 1. Streamlit secrets (prioritaire en prod)
+    try:
+        key = st.secrets.get("GROQ_API_KEY", "")
+        if key:
+            return key
+    except Exception:
+        pass
+    # 2. Variable d'environnement (fallback local)
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except Exception:
+        pass
+    return os.environ.get("GROQ_API_KEY", "")
 
-MODEL_LLM = "openai/gpt-oss-120b"      # Groq Llama
-MODEL_STT = "whisper-large-v3"          # Groq Whisper
-VOICE_TTS = "en-US-AriaNeural"          # Voix anglaise pour l'IA
+
+GROQ_API_KEY = _get_groq_key()
+
+MODEL_LLM = "openai/gpt-oss-120b"
+MODEL_STT = "whisper-large-v3"
+VOICE_TTS = "en-US-AriaNeural"
 
 LESSONS_FILE = Path(__file__).parent / "lessons.json"
 
@@ -49,7 +65,6 @@ def transcribe_audio(audio_bytes, language="en"):
 
     client = get_groq_client()
 
-    # Groq attend un fichier
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         tmp.write(audio_bytes)
         tmp_path = tmp.name
@@ -76,7 +91,6 @@ def transcribe_audio(audio_bytes, language="en"):
 # IA - CONVERSATION LIBRE
 # ============================================================
 def llm_conversation(user_text, history, level="intermediaire"):
-    """Repond en anglais et continue la conversation."""
     client = get_groq_client()
 
     system_prompt = f"""
@@ -94,7 +108,7 @@ Rules:
 """.strip()
 
     messages = [{"role": "system", "content": system_prompt}]
-    for h in history[-10:]:  # Garde les 10 derniers messages
+    for h in history[-10:]:
         messages.append(h)
     messages.append({"role": "user", "content": user_text})
 
@@ -111,13 +125,9 @@ Rules:
 
 
 # ============================================================
-# IA - MODE COURS (slide par slide)
+# IA - MODE COURS
 # ============================================================
 def llm_play_slide(slide, user_input, history):
-    """
-    Joue une slide du cours en interaction.
-    Retourne (response_text, should_advance_bool).
-    """
     client = get_groq_client()
 
     slide_num = slide.get("slide_num", "?")
@@ -133,7 +143,7 @@ Role: {role}
 Instructions: {script}
 
 Rules:
-- If the slide is COVER/OVERVIEW: read it, greet her, set the objective. Ask if she's ready.
+- If COVER/OVERVIEW: read it, greet her, set the objective. Ask if she's ready.
 - If WARM-UP: ask the warm-up questions one by one, wait for her answers.
 - If VOCABULARY: say the word, ask her to repeat. Then ask her to use it in a sentence.
 - If COMMON MISTAKES: show the mistake, ask "Is this correct?", wait for her answer.
@@ -160,7 +170,6 @@ Start by asking your first question or saying your first line. Keep it SHORT.
             max_tokens=400,
         )
         reply = response.choices[0].message.content
-        # Detection grossiere : si l'IA dit "next slide" ou "let's move on"
         should_advance = "next slide" in reply.lower() or "move on" in reply.lower()
         return reply, should_advance
     except Exception as e:
@@ -168,14 +177,12 @@ Start by asking your first question or saying your first line. Keep it SHORT.
 
 
 # ============================================================
-# TTS - Texte -> Audio
+# TTS
 # ============================================================
 def text_to_speech(text, voice=VOICE_TTS, lang="en"):
-    """Genere un mp3 depuis le texte avec edge-tts."""
     import edge_tts
     import re
 
-    # Nettoie les emojis / markdown basique
     text = re.sub(r"[\U0001F300-\U0001FAFF\u2600-\u27BF]", "", text)
     text = text.replace("**", "").replace("__", "").replace("*", "").replace("_", "")
 
@@ -202,7 +209,6 @@ def text_to_speech(text, voice=VOICE_TTS, lang="en"):
 # LOAD LESSONS
 # ============================================================
 def load_lessons():
-    """Charge le JSON des lecons."""
     if not LESSONS_FILE.exists():
         return {}
     with open(LESSONS_FILE, "r", encoding="utf-8") as f:
@@ -210,15 +216,17 @@ def load_lessons():
 
 
 # ============================================================
-# UI STREAMLIT
+# UI
 # ============================================================
 def render_voice_module():
-    """Affiche le module vocal complet dans Streamlit."""
     st.markdown("---")
     st.markdown("## 🎤 Práctica con IA")
     st.markdown("*Habla en inglés, la IA te escucha, corrige y responde con voz.*")
 
-    # Choix du mode
+    if not GROQ_API_KEY:
+        st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
+        return
+
     mode = st.radio(
         "**Elige el modo:**",
         ["💬 Conversación libre", "📚 Lección del día"],
@@ -231,8 +239,8 @@ def render_voice_module():
     else:
         render_guided_lesson()
 
+
 def render_free_conversation():
-    """Mode conversation libre."""
     st.markdown("### 💬 Conversación libre")
     st.markdown("*La IA te habla en inglés, tu respondes, ella te corrige.*")
 
@@ -278,8 +286,8 @@ def render_free_conversation():
         st.session_state.conv_last_audio = None
         st.rerun()
 
+
 def render_guided_lesson():
-    """Mode cours guide slide par slide."""
     st.markdown("### 📚 Lección del día")
     st.markdown("*La IA reproduce la lección del profesor, slide por slide.*")
 

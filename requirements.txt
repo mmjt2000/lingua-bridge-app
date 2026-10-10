@@ -9,3 +9,4 @@ google-api-python-client
 groq
 edge-tts
 python-dotenv
+audioop-lts
