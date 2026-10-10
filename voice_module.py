@@ -62,7 +62,7 @@ def get_groq_client():
 
 
 # ============================================================
-# TRANSCRIPTION (audio -> texte)
+# TRANSCRIPTION
 # ============================================================
 def transcribe_audio(audio_bytes, language="en"):
     if not audio_bytes:
@@ -187,7 +187,6 @@ Start by asking your first question or saying your first line. Keep it SHORT.
 def text_to_speech(text, voice=VOICE_TTS):
     import edge_tts
 
-    # Nettoie emojis et markdown
     text = re.sub(r"[\U0001F300-\U0001FAFF\u2600-\u27BF]", "", text)
     text = text.replace("**", "").replace("__", "").replace("*", "").replace("_", "")
 
@@ -230,20 +229,15 @@ def render_voice_module():
 
     if not GROQ_API_KEY:
         st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
-        # DEBUG temporaire
-                try:
-            st.write("**Debug 1** — clés:", list(st.secrets.keys()))
-            st.write("**Debug 2** — type secrets:", type(st.secrets).__name__)
-            # Test d'accès direct
+        try:
+            st.write("**Debug** — clés dispo :", list(st.secrets.keys()))
             try:
                 v1 = st.secrets["GROQ_KEY_1"]
-                st.write("**Debug 3** — GROQ_KEY_1 valeur brute:", repr(v1))
-            except KeyError:
-                st.write("**Debug 3** — GROQ_KEY_1 : KeyError")
-            except Exception as e2:
-                st.write("**Debug 3** — erreur:", str(e2))
+                st.write("GROQ_KEY_1 =", repr(v1))
+            except Exception as e1:
+                st.write("GROQ_KEY_1 erreur :", str(e1))
         except Exception as e:
-            st.write("Erreur lecture secrets :", str(e))
+            st.write("Erreur secrets :", str(e))
         return
 
     mode = st.radio(
