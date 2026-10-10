@@ -228,7 +228,7 @@ def render_voice_module():
     st.markdown("## 🎤 Práctica con IA")
     st.markdown("*Habla en inglés, la IA te escucha, corrige y responde con voz.*")
 
-       if not GROQ_API_KEY:
+    if not GROQ_API_KEY:
         st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
         # DEBUG temporaire
         try:
