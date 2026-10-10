@@ -20,30 +20,23 @@ from groq import Groq
 # CONFIG
 # ============================================================
 def _get_groq_key():
-    """Recupere la cle Groq depuis secrets Streamlit ou env."""
-    # 1. Streamlit secrets (prioritaire en prod)
+    """Recupere la cle Groq (2 parties si necessaire)."""
     try:
+        p1 = st.secrets.get("GROQ_KEY_PART1", "")
+        p2 = st.secrets.get("GROQ_KEY_PART2", "")
+        if p1 and p2:
+            return p1 + p2
         key = st.secrets.get("GROQ_API_KEY", "")
         if key:
             return key
     except Exception:
         pass
-    # 2. Variable d'environnement (fallback local)
     try:
         from dotenv import load_dotenv
         load_dotenv()
     except Exception:
         pass
     return os.environ.get("GROQ_API_KEY", "")
-
-
-GROQ_API_KEY = _get_groq_key()
-
-MODEL_LLM = "openai/gpt-oss-120b"
-MODEL_STT = "whisper-large-v3"
-VOICE_TTS = "en-US-AriaNeural"
-
-LESSONS_FILE = Path(__file__).parent / "lessons.json"
 
 
 # ============================================================
