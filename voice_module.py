@@ -214,8 +214,6 @@ def load_lessons():
 # ============================================================
 def render_voice_module():
     """Affiche le module vocal complet dans Streamlit."""
-    from audiorecorder import audiorecorder  # streamlit-audiorecorder
-
     st.markdown("---")
     st.markdown("## 🎤 Práctica con IA")
     st.markdown("*Habla en inglés, la IA te escucha, corrige y responde con voz.*")
@@ -229,80 +227,67 @@ def render_voice_module():
     )
 
     if mode == "💬 Conversación libre":
-        render_free_conversation(audiorecorder)
+        render_free_conversation()
     else:
-        render_guided_lesson(audiorecorder)
+        render_guided_lesson()
 
-
-def render_free_conversation(audiorecorder):
+def render_free_conversation():
     """Mode conversation libre."""
     st.markdown("### 💬 Conversación libre")
     st.markdown("*La IA te habla en inglés, tu respondes, ella te corrige.*")
 
-    # Init session state
     if "conv_history" not in st.session_state:
         st.session_state.conv_history = []
     if "conv_last_audio" not in st.session_state:
         st.session_state.conv_last_audio = None
 
-    # Affiche l'historique
     for msg in st.session_state.conv_history[-8:]:
         role_icon = "🧑" if msg["role"] == "user" else "🤖"
         with st.chat_message(msg["role"]):
             st.markdown(f"{role_icon} {msg['content']}")
 
-    # Enregistrement audio
     st.markdown("**🎤 Habla:**")
-    audio = audiorecorder("🔴 Grabar", "⏹ Parar", key="conv_audio")
+    audio_file = st.audio_input("Graba tu respuesta", key="conv_audio")
 
-    if audio and len(audio) > 0 and audio != st.session_state.conv_last_audio:
-        st.session_state.conv_last_audio = audio
+    if audio_file is not None:
+        wav_data = audio_file.getvalue()
+        if wav_data and wav_data != st.session_state.conv_last_audio:
+            st.session_state.conv_last_audio = wav_data
 
-        # Convertir AudioSegment en bytes
-        audio_bytes = io.BytesIO()
-        audio.export(audio_bytes, format="wav")
-        wav_data = audio_bytes.getvalue()
+            with st.spinner("Transcribiendo..."):
+                user_text = transcribe_audio(wav_data, language="en")
 
-        with st.spinner("Transcribiendo..."):
-            user_text = transcribe_audio(wav_data, language="en")
+            if user_text and not user_text.startswith("[Erreur"):
+                st.session_state.conv_history.append({"role": "user", "content": user_text})
+                with st.chat_message("user"):
+                    st.markdown(f"🧑 {user_text}")
 
-        if user_text and not user_text.startswith("[Erreur"):
-            # Affiche ce que l'utilisateur a dit
-            st.session_state.conv_history.append({"role": "user", "content": user_text})
-            with st.chat_message("user"):
-                st.markdown(f"🧑 {user_text}")
+                with st.spinner("La IA está pensando..."):
+                    reply = llm_conversation(user_text, st.session_state.conv_history, "intermediaire")
+                st.session_state.conv_history.append({"role": "assistant", "content": reply})
 
-            # Reponse IA
-            with st.spinner("La IA está pensando..."):
-                reply = llm_conversation(user_text, st.session_state.conv_history, "intermediaire")
-            st.session_state.conv_history.append({"role": "assistant", "content": reply})
+                with st.chat_message("assistant"):
+                    st.markdown(f"🤖 {reply}")
 
-            with st.chat_message("assistant"):
-                st.markdown(f"🤖 {reply}")
+                audio_reply = text_to_speech(reply, voice="en-US-AriaNeural", lang="en")
+                if audio_reply:
+                    st.audio(audio_reply, format="audio/mp3", autoplay=True)
 
-            # Genere l'audio de la reponse
-            audio_reply = text_to_speech(reply, voice="en-US-AriaNeural", lang="en")
-            if audio_reply:
-                st.audio(audio_reply, format="audio/mp3", autoplay=True)
-
-    # Bouton reset
     if st.button("🔄 Nueva conversación", key="conv_reset"):
         st.session_state.conv_history = []
         st.session_state.conv_last_audio = None
         st.rerun()
 
-
-def render_guided_lesson(audiorecorder):
+def render_guided_lesson():
     """Mode cours guide slide par slide."""
     st.markdown("### 📚 Lección del día")
     st.markdown("*La IA reproduce la lección del profesor, slide por slide.*")
 
     lessons = load_lessons()
     if not lessons:
-        st.warning("⚠️ No se encontró lessons.json. Ejecuta convert_lessons.py primero.")
+        st.warning("⚠️ No se encontró lessons.json.")
         return
 
-    # Selection de la lecon
     lesson_keys = sorted(lessons.keys())
     lesson_labels = [f"Class {lessons[k]['class_num']:02d}" for k in lesson_keys]
     selected_idx = st.selectbox(
@@ -315,14 +300,9 @@ def render_guided_lesson(audiorecorder):
     lesson = lessons[lesson_key]
     slides = lesson["slides"]
 
-    # Init session state
     state_key = f"guided_{lesson_key}"
     if state_key not in st.session_state:
-        st.session_state[state_key] = {
-            "slide_idx": 0,
-            "history": [],
-            "started": False,
-        }
+        st.session_state[state_key] = {"slide_idx": 0, "history": [], "started": False}
 
     state = st.session_state[state_key]
     slide_idx = state["slide_idx"]
@@ -334,24 +314,20 @@ def render_guided_lesson(audiorecorder):
             st.rerun()
         return
 
-    # Affiche la slide actuelle
     slide = slides[slide_idx]
     progress = (slide_idx + 1) / len(slides)
     st.progress(progress, text=f"Slide {slide_idx+1}/{len(slides)} — {slide.get('title', '')}")
-
     st.info(f"**Slide {slide_idx+1}** · Role: {slide.get('role', '')} · Duration: {slide.get('duration', '')}")
 
-    # Historique du dialogue
     for msg in state["history"][-6:]:
         role_icon = "🧑" if msg["role"] == "user" else "🤖"
         with st.chat_message(msg["role"]):
             st.markdown(f"{role_icon} {msg['content']}")
 
-    # Bouton "Démarrer la slide"
     if not state.get("started"):
         if st.button("▶️ Empezar esta slide", key=f"start_{slide_idx}"):
             with st.spinner("La IA empieza..."):
-                reply, should_advance = llm_play_slide(slide, "", state["history"])
+                reply, _ = llm_play_slide(slide, "", state["history"])
             state["history"].append({"role": "assistant", "content": reply})
             state["started"] = True
             st.session_state[state_key] = state
@@ -361,42 +337,37 @@ def render_guided_lesson(audiorecorder):
             audio_reply = text_to_speech(reply, voice="en-US-AriaNeural")
             if audio_reply:
                 st.audio(audio_reply, format="audio/mp3", autoplay=True)
-
             st.rerun()
         return
 
-    # Enregistrement de la reponse
     st.markdown("**🎤 Tu respuesta:**")
-    audio = audiorecorder("🔴 Grabar", "⏹ Parar", key=f"guided_audio_{slide_idx}")
+    audio_file = st.audio_input("Graba tu respuesta", key=f"guided_audio_{slide_idx}")
 
-    if audio and len(audio) > 0:
-        audio_bytes = io.BytesIO()
-        audio.export(audio_bytes, format="wav")
-        wav_data = audio_bytes.getvalue()
+    if audio_file is not None:
+        wav_data = audio_file.getvalue()
+        if wav_data:
+            with st.spinner("Transcribiendo..."):
+                user_text = transcribe_audio(wav_data, language="en")
 
-        with st.spinner("Transcribiendo..."):
-            user_text = transcribe_audio(wav_data, language="en")
+            if user_text and not user_text.startswith("[Erreur"):
+                state["history"].append({"role": "user", "content": user_text})
+                with st.chat_message("user"):
+                    st.markdown(f"🧑 {user_text}")
 
-        if user_text and not user_text.startswith("[Erreur"):
-            state["history"].append({"role": "user", "content": user_text})
-            with st.chat_message("user"):
-                st.markdown(f"🧑 {user_text}")
+                with st.spinner("La IA responde..."):
+                    reply, _ = llm_play_slide(slide, user_text, state["history"])
+                state["history"].append({"role": "assistant", "content": reply})
 
-            with st.spinner("La IA responde..."):
-                reply, should_advance = llm_play_slide(slide, user_text, state["history"])
-            state["history"].append({"role": "assistant", "content": reply})
+                with st.chat_message("assistant"):
+                    st.markdown(f"🤖 {reply}")
 
-            with st.chat_message("assistant"):
-                st.markdown(f"🤖 {reply}")
+                audio_reply = text_to_speech(reply, voice="en-US-AriaNeural")
+                if audio_reply:
+                    st.audio(audio_reply, format="audio/mp3", autoplay=True)
 
-            audio_reply = text_to_speech(reply, voice="en-US-AriaNeural")
-            if audio_reply:
-                st.audio(audio_reply, format="audio/mp3", autoplay=True)
+                st.session_state[state_key] = state
+                st.rerun()
 
-            st.session_state[state_key] = state
-            st.rerun()
-
-    # Boutons de navigation
     col1, col2 = st.columns(2)
     with col1:
         if st.button("⬅️ Slide précédente", key=f"prev_{slide_idx}") and slide_idx > 0:
