@@ -19,6 +19,7 @@ from groq import Groq
 # ============================================================
 # CONFIG
 # ============================================================
+
 def _get_groq_key():
     """Recupere la cle Groq (2 parties si necessaire)."""
     try:
@@ -42,6 +43,7 @@ def _get_groq_key():
 # ============================================================
 # GROQ CLIENT
 # ============================================================
+
 def get_groq_client():
     if not GROQ_API_KEY:
         raise ValueError("GROQ_API_KEY manquante")
