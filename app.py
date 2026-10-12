@@ -111,17 +111,17 @@ def render_sidebar():
         """, unsafe_allow_html=True)
         st.markdown("<div style='height: 1.2rem;'></div>", unsafe_allow_html=True)
         if user["role"] == "teacher":
-                        menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
+            menu_items = [("Panel", "dashboard"), ("Envios", "submissions"), ("Sesiones", "sessions"), ("Lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music"), ("Progreso", "progress"), ("Certificado", "certificate"), ("Cambiar contrasena", "change_password")]
         elif user["role"] == "student":
-            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
+            menu_items = [("Inicio", "dashboard"), ("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music"), ("Mis ejercicios", "exercises"), ("Mi progreso", "progress"), ("Mi calendario", "calendar")]
         else:
-            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Musica", "music")]
+            menu_items = [("Mis lecciones", "lessons"), ("Pronunciacion", "pronunciation"), ("Práctica IA", "voice_ai"), ("Musica", "music")]
             if user.get("app_url"):
-            	st.markdown("---")
-            	st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
-            	st.caption("Credenciales para tu aplicacion:")
-            	st.code("Usuario: " + user.get("app_email", "") + "\nContrasena: " + user.get("app_password", ""), language=None)
-            	st.markdown("---")
+                st.markdown("---")
+                st.link_button("Acceder a mi aplicacion", user["app_url"], use_container_width=True)
+                st.caption("Credenciales para tu aplicacion:")
+                st.code("Usuario: " + user.get("app_email", "") + "\nContrasena: " + user.get("app_password", ""), language=None)
+                st.markdown("---")
         for label, key in menu_items:
             is_active = st.session_state.page == key
             if st.button(label, key=f"nav_{key}", use_container_width=True, type="primary" if is_active else "secondary"):
@@ -616,8 +616,6 @@ def main():
             render_voice_module()
         elif page == "music":
             page_music()
-        elif page == "music":
-            page_music()
         elif page == "progress":
             page_progress()
         elif page == "certificate":
@@ -628,7 +626,8 @@ def main():
             page_teacher_dashboard()
     elif user["role"] == "student":
         if page == "dashboard":
-            st.markdown('<div class="main-header">Bienvenida, Ingrid</div>', unsafe_allow_html=True)
+            first_name = user.get("first_name") or user.get("full_name", "estudiante").split()[0]
+            st.markdown(f'<div class="main-header">Bienvenida, {first_name}</div>', unsafe_allow_html=True)
             st.markdown('<div class="sub-header">Langues Bridge Academy - Ingles y Frances</div>', unsafe_allow_html=True)
             stats = get_stats()
             col1, col2, col3 = st.columns(3)
@@ -642,6 +641,9 @@ def main():
             page_lessons()
         elif page == "pronunciation":
             page_pronunciation()
+        elif page == "voice_ai":
+            from voice_module import render_voice_module
+            render_voice_module()
         elif page == "music":
             page_music()
         elif page == "exercises":
@@ -657,6 +659,9 @@ def main():
             page_music()
         elif page == "pronunciation":
             page_pronunciation()
+        elif page == "voice_ai":
+            from voice_module import render_voice_module
+            render_voice_module()
         else:
             page_lessons()
 
