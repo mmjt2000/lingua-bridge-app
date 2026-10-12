@@ -47,7 +47,68 @@ GROQ_API_KEY = _get_groq_key()
 
 MODEL_LLM = "openai/gpt-oss-120b"
 MODEL_STT = "whisper-large-v3"
-VOICE_TTS = "en-US-AriaNeural"
+
+# Config par langue
+LANG_CONFIG = {
+    "en": {
+        "voice": "en-US-AriaNeural",
+        "stt_lang": "en",
+        "title": "🎤 Práctica con IA",
+        "subtitle": "*Habla en inglés, la IA te escucha, corrige y responde con voz.*",
+        "prompt": """You are an English conversation tutor for a Spanish-speaking student named {student_name}.
+Her English level: {level}.
+
+IMPORTANT CONTEXT:
+- The student may be Ingrid, Maryse, or Laeticia (all Spanish-speaking, intermediate level).
+- Adapt your vocabulary and topics to her level.
+
+Rules:
+- ALWAYS respond in English.
+- Keep responses SHORT (2-4 sentences max).
+- End your reply with an OPEN QUESTION to keep the conversation going.
+- If she makes a grammar mistake, gently correct it: "Nice! Small correction: ... Better: ..."
+- If she says something in Spanish, translate it to English and encourage her to repeat.
+- Be warm, encouraging, natural - like a friendly tutor.
+- Never lecture. Keep it conversational.""",
+        "error_key": "GROQ_API_KEY n'est pas configurée.",
+        "start_msg": "**🎤 Habla:**",
+        "recording_msg": "Graba tu respuesta",
+        "transcribing": "Transcribiendo...",
+        "thinking": "La IA está pensando...",
+        "new_conv": "🔄 Nueva conversación",
+        "free_conv_title": "### 💬 Conversación libre",
+    },
+    "fr": {
+        "voice": "fr-FR-DeniseNeural",
+        "stt_lang": "fr",
+        "title": "🎤 Pratique avec IA",
+        "subtitle": "*Parle en français, l'IA t'écoute, corrige et répond avec sa voix.*",
+        "prompt": """Tu es un tuteur de conversation en français pour une étudiante hispanophone nommée {student_name}.
+Son niveau de français : {level}.
+
+CONTEXTE IMPORTANT :
+- L'étudiante peut être Ingrid, Maryse ou Laeticia (toutes hispanophones, niveau intermédiaire).
+- Adapte ton vocabulaire et tes sujets à son niveau.
+
+Règles :
+- Réponds TOUJOURS en français.
+- Garde tes réponses COURTES (2-4 phrases max).
+- Termine ta réponse par une QUESTION OUVERTE pour continuer la conversation.
+- Si elle fait une erreur de grammaire, corrige-la gentiment : "Bravo ! Petite correction : ... Mieux : ..."
+- Si elle parle en espagnol, traduis en français et encourage-la à répéter.
+- Sois chaleureux, encourageant, naturel - comme un tuteur amical.
+- Ne fais jamais de cours magistral. Reste conversationnel.""",
+        "error_key": "GROQ_API_KEY n'est pas configurée.",
+        "start_msg": "**🎤 Parle :**",
+        "recording_msg": "Enregistre ta réponse",
+        "transcribing": "Transcription en cours...",
+        "thinking": "L'IA réfléchit...",
+        "new_conv": "🔄 Nouvelle conversation",
+        "free_conv_title": "### 💬 Conversation libre",
+    },
+}
+
+VOICE_TTS = LANG_CONFIG["en"]["voice"]  # default
 
 LESSONS_FILE = Path(__file__).parent / "lessons.json"
 
@@ -95,26 +156,11 @@ def transcribe_audio(audio_bytes, language="en"):
 # ============================================================
 # IA - CONVERSATION LIBRE
 # ============================================================
-def llm_conversation(user_text, history, level="intermediaire", student_name="Student"):
+def llm_conversation(user_text, history, level="intermediaire", student_name="Student", lang="en"):
     client = get_groq_client()
 
-    system_prompt = f"""
-You are an English conversation tutor for a Spanish-speaking student named {student_name}.
-Her English level: {level}.
-
-IMPORTANT CONTEXT:
-- The student may be Ingrid, Maryse, or Laeticia (all Spanish-speaking, intermediate level).
-- Adapt your vocabulary and topics to her level.
-
-Rules:
-- ALWAYS respond in English.
-- Keep responses SHORT (2-4 sentences max).
-- End your reply with an OPEN QUESTION to keep the conversation going.
-- If she makes a grammar mistake, gently correct it: "Nice! Small correction: ... Better: ..."
-- If she says something in Spanish, translate it to English and encourage her to repeat.
-- Be warm, encouraging, natural - like a friendly tutor.
-- Never lecture. Keep it conversational.
-""".strip()
+    cfg = LANG_CONFIG.get(lang, LANG_CONFIG["en"])
+    system_prompt = cfg["prompt"].format(student_name=student_name, level=level).strip()
 
     messages = [{"role": "system", "content": system_prompt}]
     for h in history[-10:]:
@@ -175,12 +221,15 @@ def load_lessons():
 # UI
 # ============================================================
 def render_voice_module():
+    lang = st.session_state.get("lang", "en")
+    cfg = LANG_CONFIG.get(lang, LANG_CONFIG["en"])
+
     st.markdown("---")
-    st.markdown("## 🎤 Práctica con IA")
-    st.markdown("*Habla en inglés, la IA te escucha, corrige y responde con voz.*")
+    st.markdown(f"## {cfg['title']}")
+    st.markdown(cfg["subtitle"])
 
     if not GROQ_API_KEY:
-        st.error("⚠️ GROQ_API_KEY n'est pas configurée.")
+        st.error(f"⚠️ {cfg['error_key']}")
         try:
             st.write("**Debug** — clés dispo :", list(st.secrets.keys()))
             try:
@@ -197,35 +246,46 @@ def render_voice_module():
 
 
 def render_free_conversation():
-    st.markdown("### 💬 Conversación libre")
+    lang = st.session_state.get("lang", "en")
+    cfg = LANG_CONFIG.get(lang, LANG_CONFIG["en"])
+
+    st.markdown(cfg["free_conv_title"])
 
     if "conv_history" not in st.session_state:
         st.session_state.conv_history = []
     if "conv_last_audio" not in st.session_state:
         st.session_state.conv_last_audio = None
+    if "conv_lang" not in st.session_state:
+        st.session_state.conv_lang = lang
+
+    # Reset conversation si on change de langue
+    if st.session_state.conv_lang != lang:
+        st.session_state.conv_history = []
+        st.session_state.conv_last_audio = None
+        st.session_state.conv_lang = lang
 
     for msg in st.session_state.conv_history[-8:]:
         role_icon = "🧑" if msg["role"] == "user" else "🤖"
         with st.chat_message(msg["role"]):
             st.markdown(f"{role_icon} {msg['content']}")
 
-    st.markdown("**🎤 Habla:**")
-    audio_file = st.audio_input("Graba tu respuesta", key="conv_audio")
+    st.markdown(cfg["start_msg"])
+    audio_file = st.audio_input(cfg["recording_msg"], key="conv_audio")
 
     if audio_file is not None:
         wav_data = audio_file.getvalue()
         if wav_data and wav_data != st.session_state.conv_last_audio:
             st.session_state.conv_last_audio = wav_data
 
-            with st.spinner("Transcribiendo..."):
-                user_text = transcribe_audio(wav_data, language="en")
+            with st.spinner(cfg["transcribing"]):
+                user_text = transcribe_audio(wav_data, language=cfg["stt_lang"])
 
             if user_text and not user_text.startswith("[Erreur"):
                 st.session_state.conv_history.append({"role": "user", "content": user_text})
                 with st.chat_message("user"):
                     st.markdown(f"🧑 {user_text}")
 
-                with st.spinner("La IA está pensando..."):
+                with st.spinner(cfg["thinking"]):
                     user_info = st.session_state.get("user", {})
                     student_name = user_info.get("full_name", "Student").split()[0]
                     reply = llm_conversation(
@@ -233,17 +293,18 @@ def render_free_conversation():
                         st.session_state.conv_history,
                         "intermediaire",
                         student_name=student_name,
+                        lang=lang,
                     )
                 st.session_state.conv_history.append({"role": "assistant", "content": reply})
 
                 with st.chat_message("assistant"):
                     st.markdown(f"🤖 {reply}")
 
-                audio_reply = text_to_speech(reply)
+                audio_reply = text_to_speech(reply, voice=cfg["voice"])
                 if audio_reply:
                     st.audio(audio_reply, format="audio/mp3", autoplay=True)
 
-    if st.button("🔄 Nueva conversación", key="conv_reset"):
+    if st.button(cfg["new_conv"], key="conv_reset"):
         st.session_state.conv_history = []
         st.session_state.conv_last_audio = None
         st.rerun()
