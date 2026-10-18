@@ -110,6 +110,113 @@ Règles :
 
 VOICE_TTS = LANG_CONFIG["en"]["voice"]  # default
 
+# ============================================================
+# CONFIG PAR NIVEAU — Adapte la pédagogie de l'IA
+# ============================================================
+LEVEL_CONFIG = {
+    "beginner": {
+        "en": {
+            "vocab": "very simple, 500 most common words",
+            "sentences": "max 5-7 words per sentence",
+            "corrections": "only critical errors (not minor mistakes)",
+            "encouragement": "very frequent (every response)",
+            "questions": "yes/no or 2-option questions",
+            "style": "speak slowly, use repetition, lots of emojis 😊",
+        },
+        "fr": {
+            "vocab": "très simple, 500 mots les plus courants",
+            "sentences": "max 5-7 mots par phrase",
+            "corrections": "seulement les erreurs critiques (pas les fautes mineures)",
+            "encouragement": "très fréquent (chaque réponse)",
+            "questions": "questions fermées (oui/non) ou 2 options",
+            "style": "parle lentement, répète, beaucoup d'emojis 😊",
+        },
+    },
+    "intermediate": {
+        "en": {
+            "vocab": "everyday vocabulary (2000 words)",
+            "sentences": "max 10-15 words per sentence",
+            "corrections": "correct grammar + vocabulary errors",
+            "encouragement": "regular (every 2-3 responses)",
+            "questions": "open-ended questions (why, how, what do you think)",
+            "style": "natural pace, conversational, use idioms occasionally",
+        },
+        "fr": {
+            "vocab": "vocabulaire courant (2000 mots)",
+            "sentences": "max 10-15 mots par phrase",
+            "corrections": "corriger grammaire + vocabulaire",
+            "encouragement": "régulier (toutes les 2-3 réponses)",
+            "questions": "questions ouvertes (pourquoi, comment, que penses-tu)",
+            "style": "rythme naturel, conversationnel, utiliser des expressions",
+        },
+    },
+    "advanced": {
+        "en": {
+            "vocab": "rich vocabulary (5000+ words)",
+            "sentences": "no limit",
+            "corrections": "correct subtle errors (style, register)",
+            "encouragement": "occasional",
+            "questions": "challenging questions (debate, opinion, hypothetical)",
+            "style": "native pace, use idioms, complex structures",
+        },
+        "fr": {
+            "vocab": "vocabulaire riche (5000+ mots)",
+            "sentences": "pas de limite",
+            "corrections": "corriger les erreurs subtiles (style, registre)",
+            "encouragement": "occasionnel",
+            "questions": "questions stimulantes (débat, opinion, hypothèse)",
+            "style": "rythme natif, expressions idiomatiques, structures complexes",
+        },
+    },
+}
+
+
+def get_adaptive_prompt(student_name, level, lang):
+    """
+    Construit un prompt adapté au niveau de l'étudiant.
+    """
+    level_key = level.lower() if level.lower() in LEVEL_CONFIG else "intermediate"
+    level_rules = LEVEL_CONFIG[level_key][lang]
+    
+    if lang == "fr":
+        base = f"""Tu es un tuteur de conversation en français pour une étudiante hispanophone nommée {student_name}.
+Son niveau de français : {level_key}.
+
+RÈGLES ADAPTÉES À SON NIVEAU :
+- Vocabulaire : {level_rules['vocab']}
+- Longueur : {level_rules['sentences']}
+- Corrections : {level_rules['corrections']}
+- Encouragements : {level_rules['encouragement']}
+- Questions : {level_rules['questions']}
+- Style : {level_rules['style']}
+
+INSTRUCTIONS GÉNÉRALES :
+- Réponds TOUJOURS en français.
+- Termine par UNE SEULE question pour continuer la conversation.
+- Si elle parle en espagnol, traduis en français et encourage-la à répéter.
+- Ne fais JAMAIS de cours magistral. Reste conversationnel.
+- Sois chaleureux, encourageant, naturel - comme un tuteur amical."""
+    else:
+        base = f"""You are an English conversation tutor for a Spanish-speaking student named {student_name}.
+Her English level: {level_key}.
+
+RULES ADAPTED TO HER LEVEL:
+- Vocabulary: {level_rules['vocab']}
+- Sentence length: {level_rules['sentences']}
+- Corrections: {level_rules['corrections']}
+- Encouragement: {level_rules['encouragement']}
+- Questions: {level_rules['questions']}
+- Style: {level_rules['style']}
+
+GENERAL INSTRUCTIONS:
+- ALWAYS respond in English.
+- End with ONE question to keep the conversation going.
+- If she speaks Spanish, translate it to English and encourage her to repeat.
+- NEVER lecture. Keep it conversational.
+- Be warm, encouraging, natural - like a friendly tutor."""
+    
+    return base.strip()
+
 LESSONS_FILE = Path(__file__).parent / "lessons.json"
 
 
@@ -156,17 +263,17 @@ def transcribe_audio(audio_bytes, language="en"):
 # ============================================================
 # IA - CONVERSATION LIBRE
 # ============================================================
-def llm_conversation(user_text, history, level="intermediaire", student_name="Student", lang="en"):
+def llm_conversation(user_text, history, level="intermediate", student_name="Student", lang="en"):
     client = get_groq_client()
-
-    cfg = LANG_CONFIG.get(lang, LANG_CONFIG["en"])
-    system_prompt = cfg["prompt"].format(student_name=student_name, level=level).strip()
-
+    
+    # Utiliser le prompt adaptatif selon le niveau
+    system_prompt = get_adaptive_prompt(student_name, level, lang)
+    
     messages = [{"role": "system", "content": system_prompt}]
     for h in history[-10:]:
         messages.append(h)
     messages.append({"role": "user", "content": user_text})
-
+    
     try:
         response = client.chat.completions.create(
             model=MODEL_LLM,
@@ -177,8 +284,6 @@ def llm_conversation(user_text, history, level="intermediaire", student_name="St
         return response.choices[0].message.content
     except Exception as e:
         return f"[Erreur LLM: {e}]"
-
-
 # ============================================================
 # TTS
 # ============================================================
@@ -288,10 +393,13 @@ def render_free_conversation():
                 with st.spinner(cfg["thinking"]):
                     user_info = st.session_state.get("user", {})
                     student_name = user_info.get("full_name", "Student").split()[0]
+                    # Récupérer le niveau selon la langue
+                    level_key = "french_level" if lang == "fr" else "english_level"
+                    student_level = user_info.get(level_key, "intermediate")
                     reply = llm_conversation(
                         user_text,
                         st.session_state.conv_history,
-                        "intermediaire",
+                        student_level,
                         student_name=student_name,
                         lang=lang,
                     )

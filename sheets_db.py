@@ -38,21 +38,22 @@ def get_sheet(name):
             name = "submissions_fr"
     return spreadsheet.worksheet(name)
 
-
 def authenticate(username, password):
     sheet = get_sheet("users")
     for r in sheet.get_all_records():
-                if str(r["username"]) == username and str(r["password"]) == password:
-                    return {
-                        "id": int(r["id"]),
-                        "username": r["username"],
-                        "password": r["password"],
-                        "role": r["role"],
-                        "full_name": r["full_name"],
-                        "email": r.get("email", ""),
-                        "app_url": r.get("app_url", ""),
-                        "app_email": r.get("app_email", ""),
-                        "app_password": r.get("app_password", "")
+        if str(r["username"]) == username and str(r["password"]) == password:
+            return {
+                "id": int(r["id"]),
+                "username": r["username"],
+                "password": r["password"],
+                "role": r["role"],
+                "full_name": r["full_name"],
+                "email": r.get("email", ""),
+                "app_url": r.get("app_url", ""),
+                "app_email": r.get("app_email", ""),
+                "app_password": r.get("app_password", ""),
+                "english_level": r.get("english_level", "intermediate"),
+                "french_level": r.get("french_level", "beginner"),
             }
     return None
 
@@ -199,3 +200,24 @@ def save_audio_submission(student_id, lesson, exercise_num, audio_bytes, filenam
             return True
     sheet.append_row([len(records) + 1, student_id, lesson, exercise_num, f"Audio: {audio_link}", datetime.now().strftime("%Y-%m-%d %H:%M"), ""])
     return True
+def update_level(user_id, lang, new_level):
+    """
+    Met à jour le niveau d'une langue pour un utilisateur.
+    lang = 'english' ou 'french'
+    new_level = 'beginner', 'intermediate', 'advanced'
+    """
+    try:
+        sheet = get_sheet("users")
+        all_records = sheet.get_all_records()
+        
+        # Trouver la ligne (index 1 = première ligne de données, +2 pour le header)
+        for i, r in enumerate(all_records):
+            if int(r["id"]) == user_id:
+                col_name = "english_level" if lang == "english" else "french_level"
+                # Trouver la lettre de colonne (J=10, K=11)
+                col_letter = "J" if lang == "english" else "K"
+                sheet.update(f"{col_letter}{i + 2}", new_level)
+                return True
+    except Exception as e:
+        print(f"[update_level] Erreur: {e}")
+    return False
