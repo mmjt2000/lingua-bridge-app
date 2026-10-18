@@ -170,7 +170,43 @@ LEVEL_CONFIG = {
     },
 }
 
-
+# ============================================================
+# SCÉNARIOS / SUJETS DE CONVERSATION
+# ============================================================
+TOPICS = {
+    "free": {
+        "en": {"label": "💬 Free conversation", "prompt": "Have a natural conversation on any topic that interests her."},
+        "fr": {"label": "💬 Conversation libre", "prompt": "Aie une conversation naturelle sur un sujet qui l'intéresse."},
+    },
+    "restaurant": {
+        "en": {"label": "🍽️ At a restaurant", "prompt": "You are a friendly waiter at a restaurant. She is the customer. Guide her to order a dish, ask for the bill."},
+        "fr": {"label": "🍽️ Au restaurant", "prompt": "Tu es un serveur sympathique dans un restaurant. Elle est la cliente. Guide-la pour commander un plat, demander l'addition."},
+    },
+    "airport": {
+        "en": {"label": "✈️ At the airport", "prompt": "You are an airline check-in agent. She is a passenger checking in. Ask about her destination, luggage, seat preference."},
+        "fr": {"label": "✈️ À l'aéroport", "prompt": "Tu es un agent d'enregistrement. Elle est une passagère. Demande sa destination, ses bagages, sa préférence de siège."},
+    },
+    "job_interview": {
+        "en": {"label": "💼 Job interview", "prompt": "You are a recruiter interviewing her for a job. Ask about her experience, skills, motivation."},
+        "fr": {"label": "💼 Entretien d'embauche", "prompt": "Tu es un recruteur qui l'interroge pour un emploi. Pose des questions sur son expérience, ses compétences, sa motivation."},
+    },
+    "doctor": {
+        "en": {"label": "🏥 At the doctor", "prompt": "You are a friendly doctor. She is a patient. Ask about her symptoms, how she feels, give simple advice."},
+        "fr": {"label": "🏥 Chez le médecin", "prompt": "Tu es un médecin sympathique. Elle est une patiente. Demande ses symptômes, comment elle se sent, donne des conseils simples."},
+    },
+    "shopping": {
+        "en": {"label": "🛍️ Shopping", "prompt": "You are a shop assistant. She is a customer. Help her find clothes, ask about size, color, price."},
+        "fr": {"label": "🛍️ Faire du shopping", "prompt": "Tu es un vendeur. Elle est une cliente. Aide-la à trouver des vêtements, demande sa taille, couleur, prix."},
+    },
+    "travel": {
+        "en": {"label": "🌍 Travel plans", "prompt": "You are a travel agent. She wants to plan a trip. Ask about destination, budget, dates."},
+        "fr": {"label": "🌍 Projets de voyage", "prompt": "Tu es un agent de voyage. Elle veut planifier un voyage. Demande sa destination, budget, dates."},
+    },
+    "daily_life": {
+        "en": {"label": "☀️ Daily life", "prompt": "Have a casual conversation about her daily routine, hobbies, family, weekend plans."},
+        "fr": {"label": "☀️ Vie quotidienne", "prompt": "Aie une conversation décontractée sur sa routine, ses hobbies, sa famille, ses projets de week-end."},
+    },
+}
 def get_adaptive_prompt(student_name, level, lang):
     """
     Construit un prompt adapté au niveau de l'étudiant.
@@ -263,11 +299,17 @@ def transcribe_audio(audio_bytes, language="en"):
 # ============================================================
 # IA - CONVERSATION LIBRE
 # ============================================================
-def llm_conversation(user_text, history, level="intermediate", student_name="Student", lang="en"):
+def llm_conversation(user_text, history, level="intermediate", student_name="Student", lang="en", topic="free"):
     client = get_groq_client()
     
     # Utiliser le prompt adaptatif selon le niveau
+        # Utiliser le prompt adaptatif selon le niveau
     system_prompt = get_adaptive_prompt(student_name, level, lang)
+    
+    # Ajouter le contexte du sujet si ce n'est pas "free"
+    if topic != "free" and topic in TOPICS:
+        topic_prompt = TOPICS[topic][lang]["prompt"]
+        system_prompt += f"\n\n=== SUJET DE LA CONVERSATION ===\n{topic_prompt}"
     
     messages = [{"role": "system", "content": system_prompt}]
     for h in history[-10:]:
@@ -355,6 +397,23 @@ def render_free_conversation():
     cfg = LANG_CONFIG.get(lang, LANG_CONFIG["en"])
 
     st.markdown(cfg["free_conv_title"])
+    # 🎯 NOUVEAU : Sélecteur de sujet
+    if "conv_topic" not in st.session_state:
+        st.session_state.conv_topic = "free"
+    
+    topic_options = {k: v[lang]["label"] for k, v in TOPICS.items()}
+    selected_topic = st.selectbox(
+        "Choisis un sujet :",
+        options=list(topic_options.keys()),
+        format_func=lambda x: topic_options[x],
+        index=list(topic_options.keys()).index(st.session_state.conv_topic),
+        key="conv_topic_selector"
+    )
+    
+    if selected_topic != st.session_state.conv_topic:
+        st.session_state.conv_topic = selected_topic
+        st.session_state.conv_history = []  # Reset conversation
+        st.rerun()
 
     if "conv_history" not in st.session_state:
         st.session_state.conv_history = []
@@ -396,12 +455,17 @@ def render_free_conversation():
                     # Récupérer le niveau selon la langue
                     level_key = "french_level" if lang == "fr" else "english_level"
                     student_level = user_info.get(level_key, "intermediate")
+                    user_info = st.session_state.get("user", {})
+                    student_name = user_info.get("full_name", "Student").split()[0]
+                    level_key = "french_level" if lang == "fr" else "english_level"
+                    student_level = user_info.get(level_key, "intermediate")
                     reply = llm_conversation(
                         user_text,
                         st.session_state.conv_history,
                         student_level,
                         student_name=student_name,
                         lang=lang,
+                        topic=st.session_state.conv_topic,
                     )
                 st.session_state.conv_history.append({"role": "assistant", "content": reply})
 
